@@ -664,11 +664,12 @@ const SCREENS = {
     return `${statusBar(NAVY)}<div class="done">
       <div class="ok">${I.check}</div>
       <h2>Request Received</h2>
-      <p>A roadside specialist will call you at <b>${callNumber()}</b> in a moment to confirm the details.</p>
+      <p>${cb.live?`A roadside specialist is calling you at <b>${callNumber()}</b> to confirm the details.`:`Tap <b>Call Me Now</b> and a roadside specialist will call you at <b>${callNumber()}</b> to confirm the details.`}</p>
       <p>Stay in a safe place with your hazard lights on.</p>
       <div class="ref">Request ${S.rsa.id}</div>
       ${memberBox()}
       <div class="foot">
+        ${callNowBtn()}
         <button class="cta ghost" data-go="rsaStatus">View Request Status</button>
       </div></div>`;
   },
@@ -695,15 +696,16 @@ const SCREENS = {
   },
 
   cbSent(){
-    const cb=S.callback;
+    const cb=S.callback||{};
     return `${statusBar(NAVY)}<div class="done">
       <div class="ok" style="background:#2466a8">${I.phone.replace('stroke="currentColor"','stroke="#fff"')}</div>
-      <h2>We're Calling You</h2>
-      <p>A member care specialist will call <b>${callNumber()}</b> in a moment.</p>
+      <h2>${cb.live?"We're Calling You":"We'll Call You"}</h2>
+      <p>${cb.live?`A member care specialist is calling <b>${callNumber()}</b> now.`:`Tap <b>Call Me Now</b> and a member care specialist will call <b>${callNumber()}</b>.`}</p>
       <p>They already have your membership details on screen.</p>
-      <div class="ref">Reference ${cb.ref}</div>
+      ${cb.ref?`<div class="ref">Reference ${cb.ref}</div>`:""}
       ${memberBox()}
       <div class="foot">
+        ${callNowBtn()}
         <button class="cta ghost" data-go="contact">Back to Contact Us</button>
       </div></div>`;
   },
@@ -737,6 +739,11 @@ const SCREENS = {
   }
 };
 
+function callNowBtn(){
+  const cb=S.callback;
+  if(cb&&cb.live) return `<button class="cta" disabled>Calling you now…</button>`;
+  return `<button class="cta big" data-act="callNow"${S.busy?" disabled":""}>${I.phone.replace('stroke="currentColor"','stroke="#fff" width="18" height="18" style="vertical-align:-3px;margin-right:8px"')}${S.busy?"Requesting…":"Call Me Now"}${isLive()?'<span class="livebadge">LIVE</span>':""}</button>`;
+}
 function memberBox(){
   const cb=S.callback||{};
   return `<div class="mbox">
@@ -745,7 +752,7 @@ function memberBox(){
       <div class="mrow"><span>Member status</span><b>${MEMBER.status} · ${MEMBER.level}</b></div>
       <div class="mrow"><span>Authenticated</span><b class="auth">✓ Yes</b></div>
     </div>
-    <div class="sent">${cb.live?"Sent to Genesys Cloud with your call request":"Not connected to Genesys Cloud. No call was placed."}</div>`;
+    ${cb.ref?`<div class="sent">${cb.live?"Sent to Genesys Cloud with your call request":"Not connected to Genesys Cloud. No call was placed."}</div>`:""}`;
 }
 function drawer(){
   return `<div class="dshade" data-act="closeDrawer"></div><div class="drawer">
@@ -820,12 +827,10 @@ const attrs = () => cbData(false);
 /* ---------------- roadside + call me ---------------- */
 async function submitRsa(){
   S.rsa = { id:"RSA-"+String(new Date().getFullYear()).slice(2)+"-"+String(Math.floor(1000000+Math.random()*8999999)), status:"RECEIVED" };
-  await requestCallback("roadside");
-  go("rsaSent");
+  S.callback=null; go("rsaSent");
 }
 async function callMember(){
-  await requestCallback("member");
-  go("cbSent");
+  S.callback=null; go("cbSent");
 }
 async function requestCallback(kind){
   const ref="CB-"+Math.floor(100000+Math.random()*899999);
@@ -912,6 +917,8 @@ document.getElementById("screen").addEventListener("click",e=>{
     case "signout": return init();
     case "submitRsa": return submitRsa();
     case "callMember": return callMember();
+    case "callNow": if(S.busy) return; S.busy=true; render();
+      return requestCallback(S.screen==="rsaSent"?"roadside":"member").finally(()=>{ S.busy=false; render(); });
     case "chat": S.drawer=false; return WEB.ready() ? WEB.open() : openChat();
     case "send": { const i=document.getElementById("chatin"); return send(i&&i.value); }
     case "ring": return ring();
