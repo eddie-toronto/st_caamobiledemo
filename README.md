@@ -20,7 +20,7 @@ If a live call fails, the app falls back to the mock.
 ## Files
 
 - `index.html` — the whole app (phone UI, going-live plan)
-- Map on the breakdown-location screen: Leaflet from unpkg, tiles from OpenStreetMap/CARTO (needs a connection)
+- Map on the breakdown-location screen: Leaflet from unpkg, tiles from OpenStreetMap (needs a connection)
 - `config.js` — demo org values. **Edit this file only.**
 - `manifest.webmanifest`, `sw.js`, `icons/` — PWA install and offline cache
 

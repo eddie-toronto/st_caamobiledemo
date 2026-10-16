@@ -768,8 +768,8 @@ function mountMap(){
   const el=document.getElementById("lmap"); if(!el) return;
   if(!window.L){ el.style.background="repeating-linear-gradient(35deg,#eceae6 0 38px,#fff 38px 46px)"; return; }
   MAP = L.map(el,{zoomControl:false,attributionControl:true}).setView([MEMBER.lat,MEMBER.lng],16);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    {subdomains:"abcd",maxZoom:20,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(MAP);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(MAP);
   MAP.attributionControl.setPrefix(false);
 }
 function go(s){
@@ -1056,6 +1056,8 @@ const WEB = {
       document.head.appendChild(ys);
     })(window, "Genesys", `https://${host}/genesys-bootstrap/genesys.min.js`, { environment: c.environment, deploymentId: c.deploymentId });
     Genesys("subscribe","Database.ready",()=>WEB.setAttrs());
+    Genesys("subscribe","Launcher.ready",()=>Genesys("command","Launcher.hide",{},()=>{},()=>{}));
+    Genesys("subscribe","Messenger.closed",()=>Genesys("command","Launcher.hide",{},()=>{},()=>{}));
   },
   setAttrs(){ if(!this.ready()) return; const a={...attrs(),entryPoint:"contact_us"}; Genesys("command","Database.set",{messaging:{customAttributes:a}}); return a; },
   open(){ this.setAttrs(); Genesys("command","Messenger.open",{},()=>{},()=>openChat()); }
