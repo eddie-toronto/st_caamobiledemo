@@ -25,7 +25,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 header.top h1{font-size:16px;margin:0;font-weight:600}
 header.top .tag{font-size:11px;background:rgba(255,255,255,.14);padding:4px 8px;border-radius:999px;white-space:nowrap}
 header.top button{background:#fff;color:var(--navy);border:0;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer}
-main{display:grid;grid-template-columns:420px 1fr;gap:20px;padding:20px;max-width:1500px;margin:0 auto}
+main{display:grid;grid-template-columns:420px;justify-content:center;gap:20px;padding:20px;max-width:1500px;margin:0 auto}
 @media (max-width:980px){main{grid-template-columns:1fr}}
 
 /* ---------- phone ---------- */
@@ -243,30 +243,9 @@ body.app-mode .toast{top:calc(10px + env(safe-area-inset-top))}
 <main>
   <div class="phone-wrap">
     <div class="phone"><div class="screen" id="screen"></div></div>
-    <div class="note">Tap through the app. Every Genesys interaction appears on the right as it happens.</div>
+    <div class="note">Tap through the app as a member would.</div>
   </div>
 
-  <div class="side">
-    <section class="panel">
-      <h2>SDK &amp; API event inspector <span class="ct" id="evcount">0 events</span></h2>
-      <div class="lanes">
-        <span class="lane l-app">Member app</span>
-        <span class="lane l-idp">CAA identity provider</span>
-        <span class="lane l-sdk">Genesys Mobile Messenger SDK</span>
-        <span class="lane l-be">CAA API gateway</span>
-        <span class="lane l-gc">Genesys Cloud</span>
-        <span class="lane l-flow">Architect / AI agent</span>
-        <span class="lane l-agent">Agent desktop</span>
-      </div>
-      <div class="events" id="events"><div class="empty">Sign in on the phone to start.</div></div>
-    </section>
-
-    <section class="panel">
-      <h2>What the agent sees <span class="ct" id="agentstate">No interaction</span></h2>
-      <div class="agent" id="agent"><div class="idle">Context passed from the app shows up here when a chat or callback reaches an agent.</div></div>
-      <div class="legend">Payloads are representative of the Genesys Cloud Mobile Messenger SDK and Platform API. Field names are simplified for the demo.</div>
-    </section>
-  </div>
 </main>
 
 <div class="golive" id="golive">
@@ -347,7 +326,7 @@ body.app-mode .toast{top:calc(10px + env(safe-area-inset-top))}
           <text x="985" y="128" fill="#6a7183" font-size="11">5 dial</text>
         </g>
       </svg>
-      <p class="why" style="font-size:12px;color:var(--muted);margin:8px 0 0">For the demo, the page holds a short-lived token for a demo user who can only create callbacks. In production, the app calls CAA's API gateway, which calls Genesys server-to-server (as shown in the inspector).</p>
+      <p class="why" style="font-size:12px;color:var(--muted);margin:8px 0 0">For the demo, the page holds a short-lived token for a demo user who can only create callbacks. In production, the app calls CAA's API gateway, which calls Genesys server-to-server.</p>
     </div>
   </section>
 
@@ -436,7 +415,7 @@ function hl(obj){
 }
 function log(ev){ S.evs.unshift(ev); renderEvents(); }
 function renderEvents(){
-  const el = document.getElementById("events");
+  const el = document.getElementById("events"); if(!el) return;
   document.getElementById("evcount").textContent = S.evs.length + (S.evs.length===1?" event":" events");
   if(!S.evs.length){ el.innerHTML='<div class="empty">Sign in on the phone to start.</div>'; return; }
   const total = S.evs.length;
@@ -450,7 +429,7 @@ function renderEvents(){
   el.scrollTop = 0;
 }
 function renderAgent(){
-  const el = document.getElementById("agent"), st = document.getElementById("agentstate");
+  const el = document.getElementById("agent"), st = document.getElementById("agentstate"); if(!el) return;
   if(!S.agent){ st.textContent="No interaction"; el.innerHTML='<div class="idle">Context passed from the app shows up here when a chat or callback reaches an agent.</div>'; return; }
   const a = S.agent;
   st.textContent = a.state;
