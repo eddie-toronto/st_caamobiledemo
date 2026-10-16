@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CAA Mobile (Genesys concept)</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CAA Mobile">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<script src="config.js"></script>
+<style>
+:root{
+  --navy:#1d2757; --blue:#2554a3; --blue-2:#3b6fd0; --sky:#e9effa; --gold:#b8922b; --gold-2:#d9b44a;
+  --ink:#1b1f2a; --muted:#6a7183; --line:#e3e6ee; --bg:#f3f5f9; --ok:#1f8a4c; --warn:#c4721a; --red:#c8302c;
+  --code-bg:#0f1525; --code-ink:#d6e2ff; --key:#8fb4ff; --str:#a5e3a1; --num:#ffcf7a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#e8ebf2;color:var(--ink)}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;background:var(--navy);color:#fff}
+header.top h1{font-size:16px;margin:0;font-weight:600}
+header.top .tag{font-size:11px;background:rgba(255,255,255,.14);padding:4px 8px;border-radius:999px;white-space:nowrap}
+header.top button{background:#fff;color:var(--navy);border:0;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer}
+main{display:grid;grid-template-columns:420px 1fr;gap:20px;padding:20px;max-width:1500px;margin:0 auto}
+@media (max-width:980px){main{grid-template-columns:1fr}}
+
+/* ---------- phone ---------- */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:390px;height:800px;background:#111;border-radius:46px;padding:12px;box-shadow:0 20px 50px rgba(20,30,60,.35);position:relative}
+.screen{width:100%;height:100%;background:#fff;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.status{height:34px;flex:0 0 34px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:12px;font-weight:600;background:#fff}
+.status.dark{background:var(--blue);color:#fff}
+.appbar{background:var(--blue);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 16px;font-weight:600;font-size:15px;flex:0 0 auto}
+.appbar .back{cursor:pointer;font-size:18px;line-height:1}
+.appbar .right{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.04em;cursor:pointer;opacity:.9}
+.body{flex:1;overflow-y:auto;background:#fff}
+.tabbar{flex:0 0 62px;display:flex;border-top:1px solid var(--line);background:#fff}
+.tabbar button{flex:1;border:0;background:none;font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.tabbar button.on{color:var(--blue);font-weight:700}
+.tabbar svg{width:22px;height:22px}
+.pad{padding:16px}
+.search{display:flex;align-items:center;gap:8px;margin:12px 16px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:12px}
+.hello{font-size:20px;font-weight:700;margin:6px 16px 10px}
+.balance{margin:0 16px;border:1px solid #c9d4ea;border-radius:8px;overflow:hidden}
+.balance .row{display:flex}
+.balance .cell{flex:1;padding:10px 12px}
+.balance .cell+.cell{border-left:1px solid var(--line)}
+.balance small{display:block;font-size:10px;color:var(--muted)}
+.balance b{font-size:20px;color:var(--navy)}
+.balance .cta{background:var(--blue);color:#fff;text-align:center;font-size:12px;padding:7px;font-weight:600}
+.help-card{margin:14px 16px;border-radius:12px;background:var(--sky);padding:14px;border:1px solid #cfdcf3}
+.help-card h3{margin:0 0 4px;font-size:14px}
+.help-card p{margin:0 0 10px;font-size:12px;color:var(--muted)}
+.btn-row{display:flex;gap:8px}
+.btn{flex:1;border:0;border-radius:8px;padding:11px 10px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+.btn.green{background:var(--ok);color:#fff}
+.btn.red{background:var(--red);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.section-h{display:flex;justify-content:space-between;align-items:center;margin:16px 16px 6px;font-weight:700;font-size:14px}
+.section-h a{font-size:11px;color:var(--blue);font-weight:600}
+.offer{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:12px}
+.offer .logo{width:40px;height:28px;border-radius:4px;background:#eef1f7;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:11px}
+.offer .v{margin-left:auto;border:1px solid var(--line);border-radius:4px;padding:3px 8px;font-size:11px}
+.offer small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase}
+.list-q{font-weight:700;font-size:17px;padding:16px 16px 8px}
+.li{display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--line);font-size:13px;cursor:pointer}
+.li:hover{background:#f7f9fd}
+.li .ic{width:24px;height:24px;color:var(--blue)}
+.li .chev{margin-left:auto;color:#aab}
+.car{display:flex;justify-content:center;padding:6px 0}
+.tire{display:flex;flex-direction:column;align-items:center;font-size:10px;gap:4px;cursor:pointer;color:var(--muted)}
+.tire .dot{width:22px;height:22px;border-radius:50%;border:2px solid #9aa6bf;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px}
+.tire.on .dot{background:var(--blue);border-color:var(--blue)}
+.radio{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;cursor:pointer}
+.radio .r{width:16px;height:16px;border-radius:50%;border:2px solid #9aa6bf}
+.radio.on .r{border:5px solid var(--blue)}
+.map{height:250px;position:relative;background:#e8efe6;overflow:hidden}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.addr{padding:12px 16px;font-size:12px;border-bottom:1px solid var(--line)}
+.addr b{display:block;font-size:13px;margin-bottom:2px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px}
+.pill.ok{background:#e3f4ea;color:var(--ok)}
+.pill.blue{background:var(--sky);color:var(--blue)}
+.pill.warn{background:#fdf0e1;color:var(--warn)}
+.status-card{margin:14px 16px;border:1px solid var(--line);border-radius:12px;padding:14px}
+.status-card .eta{font-size:28px;font-weight:800;color:var(--navy)}
+.steps{display:flex;gap:4px;margin:10px 0}
+.steps i{flex:1;height:5px;border-radius:3px;background:#dfe4ee}
+.steps i.on{background:var(--blue)}
+.kv{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;color:var(--muted)}
+.kv b{color:var(--ink);font-weight:600}
+/* login */
+.login{padding:28px 22px;display:flex;flex-direction:column;gap:12px;height:100%;background:linear-gradient(180deg,var(--navy),#27357a 55%,#fff 55%)}
+.login .brand{color:#fff;text-align:center;margin:20px 0 26px}
+.login .brand .badge{width:64px;height:64px;border-radius:50%;background:#fff;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:var(--navy);font-weight:900;font-size:13px;border:3px solid var(--red)}
+.login .brand h2{margin:0;font-size:20px}
+.login .brand p{margin:4px 0 0;font-size:12px;opacity:.85}
+.field{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px}
+.field small{display:block;color:var(--muted);font-size:10px;margin-bottom:2px}
+.login .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:10px}
+.mfa{display:flex;gap:8px;justify-content:center}
+.mfa span{width:36px;height:44px;border:1.5px solid var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+/* member card */
+.mcard{margin:16px;border-radius:14px;padding:16px;color:#fff;background:linear-gradient(135deg,var(--gold),var(--gold-2));min-height:190px;position:relative;box-shadow:0 8px 20px rgba(120,90,10,.3)}
+.mcard.plus{background:linear-gradient(135deg,#1e3a8a,#3b6fd0)}
+.mcard h2{margin:0 0 4px;font-size:20px}
+.mcard .num{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;letter-spacing:.08em;margin-top:26px}
+.mcard small{opacity:.85;font-size:11px}
+.acct-head{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;padding:18px 16px 22px}
+.acct-head.plus{background:linear-gradient(135deg,#1e3a8a,#3b6fd0)}
+.acct-head h2{margin:0;font-size:22px}
+.acct-head p{margin:6px 0 0;font-size:11px;opacity:.9}
+/* chat */
+.chat{flex:1;overflow-y:auto;background:#f4f6fa;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.35}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.agent{background:#fff;border:1px solid #bfe0cb;align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg .who{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.sys{align-self:center;font-size:10px;color:var(--muted);background:#e7ebf3;padding:4px 10px;border-radius:999px}
+.qr{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:#f4f6fa}
+.qr button{border:1.5px solid var(--blue);background:#fff;color:var(--blue);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.composer{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:#fff}
+.composer input{flex:1;border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:13px;outline:none}
+.composer button{border:0;background:var(--blue);color:#fff;border-radius:999px;padding:0 14px;font-weight:700;cursor:pointer}
+.authbar{display:flex;align-items:center;gap:6px;font-size:10px;padding:6px 12px;background:#e3f4ea;color:var(--ok);font-weight:700}
+/* call screens */
+.ring{position:absolute;inset:0;background:linear-gradient(180deg,#0e1633,#1d2757);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:80px 30px 60px;z-index:5}
+.ring h2{margin:8px 0 4px;font-size:24px}
+.ring p{margin:0;opacity:.8;font-size:13px}
+.ring .avatar{width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;border:3px solid rgba(255,255,255,.4)}
+.ring .acts{display:flex;gap:60px}
+.ring .acts button{width:66px;height:66px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:24px}
+.pulse{animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}70%{box-shadow:0 0 0 22px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.toast{position:absolute;left:12px;right:12px;top:42px;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px;font-size:12px;z-index:6;display:flex;gap:10px;align-items:center}
+.toast .ti{width:34px;height:34px;border-radius:8px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px}
+.note{font-size:11px;color:var(--muted);text-align:center;max-width:390px}
+
+/* ---------- right side ---------- */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,.08);overflow:hidden}
+.panel > h2{margin:0;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--navy)}
+.panel > h2 .ct{margin-left:auto;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.lanes{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);font-size:11px}
+.lane{padding:3px 8px;border-radius:999px;font-weight:700;font-size:11px}
+.l-app{background:#e9effa;color:var(--blue)}
+.l-idp{background:#f3e8fb;color:#7a3aa8}
+.l-sdk{background:#e4f5f3;color:#0f7c70}
+.l-gc{background:#ffece5;color:#c2410c}
+.l-be{background:#f1f2f5;color:#4b5263}
+.l-flow{background:#fff5d6;color:#946200}
+.l-agent{background:#e3f4ea;color:var(--ok)}
+.events{max-height:470px;overflow-y:auto;padding:4px 0}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px}
+.ev{padding:12px 16px;border-bottom:1px solid var(--line);animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.ev .h{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ev .n{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:22px}
+.ev .arrow{color:var(--muted);font-size:12px}
+.ev .t{font-weight:700;font-size:13px;margin:6px 0 2px}
+.ev .ep{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#4b5263;word-break:break-all}
+.ev .ep b{color:var(--ok)}
+.ev .why{font-size:12px;color:var(--muted);margin:4px 0 0}
+.ev details{margin-top:6px}
+.ev summary{cursor:pointer;font-size:11px;color:var(--blue);font-weight:600}
+pre{margin:6px 0 0;background:var(--code-bg);color:var(--code-ink);font-size:11px;line-height:1.45;padding:10px 12px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace}
+pre .k{color:var(--key)} pre .s{color:var(--str)} pre .nm{color:var(--num)} pre .c{color:#7f8db0}
+.agent{padding:14px 16px;font-size:12px}
+.agent .row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.agent table{width:100%;border-collapse:collapse}
+.agent td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}
+.agent td:first-child{color:var(--muted);width:42%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+.agent .idle{color:var(--muted);text-align:center;padding:16px 0}
+.legend{font-size:11px;color:var(--muted);padding:10px 16px;border-top:1px solid var(--line)}
+header.top a{color:#fff;font-size:12px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,.35);padding:5px 10px;border-radius:6px;white-space:nowrap}
+
+/* ---------- going live ---------- */
+.golive{max-width:1500px;margin:0 auto 40px;padding:0 20px;display:flex;flex-direction:column;gap:16px}
+.golive .panel{padding:0}
+.gl-body{padding:16px}
+.verdict{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:980px){.verdict{grid-template-columns:1fr}}
+.opt{border:1px solid var(--line);border-radius:10px;padding:14px}
+.opt.win{border:2px solid var(--ok);background:#f4fbf7}
+.opt h3{margin:0 0 6px;font-size:14px;display:flex;align-items:center;gap:8px}
+.opt code{font-size:11px;background:#eef1f7;padding:2px 6px;border-radius:4px}
+.opt ul{margin:8px 0 0;padding-left:18px;font-size:12.5px;line-height:1.5}
+.scope{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:12px}
+.scope span{padding:4px 10px;border-radius:999px;font-weight:600}
+.s-live{background:#e3f4ea;color:var(--ok)}
+.s-mock{background:#f1f2f5;color:#4b5263}
+.arch{width:100%;height:auto;display:block}
+table.work{width:100%;border-collapse:collapse;font-size:12.5px}
+table.work th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px;border-bottom:2px solid var(--line)}
+table.work td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.work td:first-child{width:28px;color:var(--muted);font-variant-numeric:tabular-nums}
+table.work .where{font-size:11px;font-weight:700;white-space:nowrap}
+table.work input{transform:scale(1.15);cursor:pointer}
+table.work tr.done td{color:var(--muted);text-decoration:line-through}
+table.work tfoot td{font-weight:700;border-bottom:0}
+.prog{height:8px;background:#e7ebf3;border-radius:4px;overflow:hidden;margin:10px 0 2px}
+.prog i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:980px){.two{grid-template-columns:1fr}}
+.risk{font-size:12.5px;line-height:1.5;margin:0;padding-left:18px}
+.risk li{margin-bottom:6px}
+.verify{font-size:10px;font-weight:700;color:var(--warn);background:#fdf0e1;padding:1px 6px;border-radius:4px;margin-left:4px}
+
+/* ---------- installed-app / phone mode ---------- */
+body.app-mode{background:#fff;overscroll-behavior:none}
+body.app-mode header.top, body.app-mode .side, body.app-mode .golive, body.app-mode .note{display:none}
+body.app-mode main{display:block;padding:0;max-width:none}
+body.app-mode .phone-wrap{display:block}
+body.app-mode .phone{width:100vw;height:100vh;height:100dvh;border-radius:0;padding:0;background:#fff;box-shadow:none}
+body.app-mode .screen{border-radius:0;padding-top:env(safe-area-inset-top)}
+body.app-mode .status{display:none}
+body.app-mode .tabbar{flex-basis:calc(62px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
+body.app-mode .composer{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+body.app-mode .toast{top:calc(10px + env(safe-area-inset-top))}
+.presenter{margin:16px;border:1px dashed #b9c3d9;border-radius:10px;padding:12px;font-size:12px}
+.presenter h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.presenter .kv{padding:3px 0}
+.presenter .btn{margin-top:8px;padding:9px}
+.presenter textarea{width:100%;margin-top:8px;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:6px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.livebadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#e3f4ea;color:var(--ok);margin-left:6px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>CAA member app with Genesys Cloud built in — concept mock</h1>
+  <span class="tag">Illustrative · fictional member data · not a production app</span>
+  <a href="#golive">Going live ↓</a>
+  <button id="reset">Reset demo</button>
+</header>
+
+<main>
+  <div class="phone-wrap">
+    <div class="phone"><div class="screen" id="screen"></div></div>
+    <div class="note">Tap through the app. Every Genesys interaction appears on the right as it happens.</div>
+  </div>
+
+  <div class="side">
+    <section class="panel">
+      <h2>SDK &amp; API event inspector <span class="ct" id="evcount">0 events</span></h2>
+      <div class="lanes">
+        <span class="lane l-app">Member app</span>
+        <span class="lane l-idp">CAA identity provider</span>
+        <span class="lane l-sdk">Genesys Mobile Messenger SDK</span>
+        <span class="lane l-be">CAA API gateway</span>
+        <span class="lane l-gc">Genesys Cloud</span>
+        <span class="lane l-flow">Architect / AI agent</span>
+        <span class="lane l-agent">Agent desktop</span>
+      </div>
+      <div class="events" id="events"><div class="empty">Sign in on the phone to start.</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>What the agent sees <span class="ct" id="agentstate">No interaction</span></h2>
+      <div class="agent" id="agent"><div class="idle">Context passed from the app shows up here when a chat or callback reaches an agent.</div></div>
+      <div class="legend">Payloads are representative of the Genesys Cloud Mobile Messenger SDK and Platform API. Field names are simplified for the demo.</div>
+    </section>
+  </div>
+</main>
+
+<div class="golive" id="golive">
+  <section class="panel">
+    <h2>Going live: what we show for real on demo day</h2>
+    <div class="gl-body">
+      <div class="verdict">
+        <div class="opt win">
+          <h3><span class="pill ok">Live</span> Callback API — <code>POST /api/v2/conversations/callbacks</code></h3>
+          <ul>
+            <li><b>No named agent needed.</b> The callback goes to a queue and the next available demo agent gets it, the same way CAA would run it.</li>
+            <li><b>Context rides along.</b> <code>data</code> lands as participant attributes, so the callback script shows the member #, level and roadside request.</li>
+            <li><b>Real phone rings.</b> The agent accepts, Genesys dials the presenter's mobile, and the room hears it.</li>
+            <li><b>One API call from the page.</b> No backend to build for the demo.</li>
+          </ul>
+        </div>
+        <div class="opt">
+          <h3><span class="pill s-mock">Keep mocked</span> Create call — <code>POST /api/v2/conversations/calls/user/{userId}</code></h3>
+          <ul>
+            <li>Rings a <b>named agent's</b> phone first, then dials the member. No queueing, no next-available agent.</li>
+            <li>Fits one moment only: an agent already chatting with the member taps "Call member".</li>
+            <li>Adds a second live dependency (a specific agent on a specific station) for little extra value in the room.</li>
+            <li>We can mention it as the chat-to-voice option and show it in the inspector.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="scope">
+        <span class="s-live">LIVE: Call me → callback → agent accepts → presenter's phone rings</span>
+        <span class="s-mock">MOCKED: sign-in, Messenger SDK chat, roadside request, AI agent</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>How the live path fits together</h2>
+    <div class="gl-body">
+      <svg class="arch" viewBox="0 0 1200 230" role="img" aria-label="Live callback architecture">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6a7183"/></marker></defs>
+        <g font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="13">
+          <rect x="10" y="60" width="200" height="90" rx="10" fill="#e9effa" stroke="#2554a3"/>
+          <text x="110" y="92" text-anchor="middle" font-weight="700" fill="#1d2757">This page</text>
+          <text x="110" y="112" text-anchor="middle" fill="#4b5263">GitHub Pages (static)</text>
+          <text x="110" y="132" text-anchor="middle" fill="#4b5263" font-size="11">presenter signs in once</text>
+
+          <rect x="290" y="10" width="200" height="70" rx="10" fill="#ffece5" stroke="#c2410c"/>
+          <text x="390" y="40" text-anchor="middle" font-weight="700" fill="#c2410c">Genesys login</text>
+          <text x="390" y="60" text-anchor="middle" fill="#4b5263" font-size="11">OAuth Code + PKCE → token</text>
+
+          <rect x="290" y="130" width="200" height="90" rx="10" fill="#ffece5" stroke="#c2410c"/>
+          <text x="390" y="160" text-anchor="middle" font-weight="700" fill="#c2410c">Genesys Cloud API</text>
+          <text x="390" y="180" text-anchor="middle" fill="#4b5263" font-size="11">POST /conversations/callbacks</text>
+          <text x="390" y="198" text-anchor="middle" fill="#4b5263" font-size="11">queue + script + data</text>
+
+          <rect x="570" y="130" width="190" height="90" rx="10" fill="#fff5d6" stroke="#946200"/>
+          <text x="665" y="160" text-anchor="middle" font-weight="700" fill="#946200">Demo queue</text>
+          <text x="665" y="180" text-anchor="middle" fill="#4b5263" font-size="11">CAA Demo – Member Care</text>
+          <text x="665" y="198" text-anchor="middle" fill="#4b5263" font-size="11">callback waits here</text>
+
+          <rect x="840" y="130" width="160" height="90" rx="10" fill="#e3f4ea" stroke="#1f8a4c"/>
+          <text x="920" y="160" text-anchor="middle" font-weight="700" fill="#1f8a4c">Demo agent</text>
+          <text x="920" y="180" text-anchor="middle" fill="#4b5263" font-size="11">Workspace · On Queue</text>
+          <text x="920" y="198" text-anchor="middle" fill="#4b5263" font-size="11">script shows member data</text>
+
+          <rect x="1060" y="60" width="130" height="90" rx="10" fill="#f1f2f5" stroke="#4b5263"/>
+          <text x="1125" y="92" text-anchor="middle" font-weight="700" fill="#1b1f2a">Presenter's</text>
+          <text x="1125" y="112" text-anchor="middle" font-weight="700" fill="#1b1f2a">mobile</text>
+          <text x="1125" y="132" text-anchor="middle" fill="#4b5263" font-size="11">PSTN call rings</text>
+
+          <path d="M210 90 L288 50" stroke="#6a7183" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+          <text x="220" y="58" fill="#6a7183" font-size="11">1 sign in</text>
+          <path d="M210 125 L288 165" stroke="#6a7183" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+          <text x="214" y="170" fill="#6a7183" font-size="11">2 Call me</text>
+          <path d="M490 175 L568 175" stroke="#6a7183" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+          <text x="503" y="168" fill="#6a7183" font-size="11">3 queued</text>
+          <path d="M760 175 L838 175" stroke="#6a7183" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+          <text x="770" y="168" fill="#6a7183" font-size="11">4 alert</text>
+          <path d="M1000 160 L1058 120" stroke="#6a7183" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+          <text x="985" y="128" fill="#6a7183" font-size="11">5 dial</text>
+        </g>
+      </svg>
+      <p class="why" style="font-size:12px;color:var(--muted);margin:8px 0 0">For the demo, the page holds a short-lived token for a demo user who can only create callbacks. In production, the app calls CAA's API gateway, which calls Genesys server-to-server (as shown in the inspector).</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Work to make "Call me" live <span class="ct" id="wkprog">0 of 0 done</span></h2>
+    <div class="gl-body">
+      <div class="prog"><i id="wkbar"></i></div>
+      <table class="work">
+        <thead><tr><th>#</th><th>Task</th><th>Where</th><th>Owner</th><th>Est.</th><th>Done</th></tr></thead>
+        <tbody id="worklist"></tbody>
+        <tfoot><tr><td></td><td>Total</td><td></td><td></td><td id="wktotal"></td><td></td></tr></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="panel">
+      <h2>Page change: the live call</h2>
+      <div class="gl-body">
+        <p style="font-size:12.5px;margin:0 0 6px">Replaces the mocked <code>submitCb()</code> when the page runs in live mode. Everything else stays mocked.</p>
+        <pre id="livecode"></pre>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Settings and risks</h2>
+      <div class="gl-body">
+        <pre id="liveconfig" style="margin-top:0"></pre>
+        <ul class="risk" style="margin-top:12px">
+          <li><b>Public repo:</b> GitHub Pages on a free plan is public, and this page carries CAA's name and app layout. Use a private repo with Pages (needs a paid GitHub plan) or restrict access.</li>
+          <li><b>No secrets in the repo:</b> PKCE needs only the client ID. Never commit a client secret.</li>
+          <li><b>Caller ID:</b> outbound calls need a Genesys Cloud Voice or BYOC number on the demo org. Check that it dials Canadian mobiles.</li>
+          <li><b>Fallback:</b> if login or the API fails, the page drops back to mock mode and the story still runs.</li>
+          <li><b>Dry run:</b> run it end to end from the demo venue's network at least once.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ---------------- fictional demo data ---------------- */
+const MEMBER = {
+  name:"Alex", fullName:"Alex Morgan", memberNumber:"620 2794 0000 4417 3", level:"Plus",
+  since:"2014", phone:"+1 416-555-0142", email:"alex.morgan@example.com",
+  vehicle:"2021 Honda CR-V · Grey", plate:"CDXR 418", caaDollars:"14.20", savings:"$86.45",
+  lat:43.7764, lng:-79.2573, place:"Hwy 401 E near Kennedy Rd, Scarborough, ON"
+};
+const ICON = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  tow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16h3l2-5h6l3 5h4v-3l-3-1-2-4"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M14 4l6 4"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  wrench:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 0-2-2z"/><path d="M4 4l5 5"/></svg>',
+  battery:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="16" height="11" rx="2"/><path d="M21 11v3M8 10v5M5.5 12.5h5"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  tire:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>',
+  fuel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="10" height="17" rx="1"/><path d="M14 9h3l2 3v6a2 2 0 0 1-4 0v-4h-1M7 8h4"/></svg>',
+  crash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15h18M5 15l2-5h10l2 5"/><circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/><path d="M12 3v3M8 4l1 2M16 4l-1 2"/></svg>',
+  stuck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14l2-4h12l2 4v3H4z"/><path d="M2 20c3-2 5 1 8-1s5 1 8-1 3 0 4 0"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5h16v11H8l-4 4z"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M8 12l3 3 5-6"/></svg>'
+};
+
+/* ---------------- state ---------------- */
+let S;
+function init(){
+  S = { screen:"login", step:0, tab:"home", authed:false, sdkReady:false, attrsSent:false,
+        service:null, tires:{fl:true,fr:false,rl:false,rr:false}, spare:true, rsa:null,
+        chat:[], chatStarted:false, escalated:false, callback:null, ringing:false, onCall:false, toast:null,
+        evs:[], agent:null };
+  renderEvents(); renderAgent(); render();
+}
+
+/* ---------------- event inspector ---------------- */
+const LANE = {app:["Member app","l-app"],idp:["CAA IdP","l-idp"],sdk:["Messenger SDK","l-sdk"],be:["CAA API gateway","l-be"],
+              gc:["Genesys Cloud","l-gc"],flow:["Architect / AI agent","l-flow"],agent:["Agent desktop","l-agent"]};
+function hl(obj){
+  const json = typeof obj==="string" ? obj : JSON.stringify(obj,null,2);
+  return json.replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/("(?:[^"\\]|\\.)*")(\s*:)/g,'<span class="k">$1</span>$2')
+    .replace(/:\s*("(?:[^"\\]|\\.)*")/g,': <span class="s">$1</span>')
+    .replace(/:\s*(-?\d+\.?\d*|true|false|null)/g,': <span class="nm">$1</span>')
+    .replace(/(\/\/[^\n]*)/g,'<span class="c">$1</span>');
+}
+function log(ev){ S.evs.unshift(ev); renderEvents(); }
+function renderEvents(){
+  const el = document.getElementById("events");
+  document.getElementById("evcount").textContent = S.evs.length + (S.evs.length===1?" event":" events");
+  if(!S.evs.length){ el.innerHTML='<div class="empty">Sign in on the phone to start.</div>'; return; }
+  const total = S.evs.length;
+  el.innerHTML = S.evs.map((e,i)=>{
+    const lanes = e.from.map(l=>`<span class="lane ${LANE[l][1]}">${LANE[l][0]}</span>`).join('<span class="arrow">→</span>');
+    const ep = e.ep ? `<div class="ep">${e.ep}</div>` : "";
+    const body = e.body ? `<details ${i===0?"open":""}><summary>${e.label||"Payload"}</summary><pre>${hl(e.body)}</pre></details>` : "";
+    return `<div class="ev"><div class="h"><span class="n">#${total-i}</span>${lanes}</div>
+      <div class="t">${e.title}</div>${ep}${e.why?`<p class="why">${e.why}</p>`:""}${body}</div>`;
+  }).join("");
+  el.scrollTop = 0;
+}
+function renderAgent(){
+  const el = document.getElementById("agent"), st = document.getElementById("agentstate");
+  if(!S.agent){ st.textContent="No interaction"; el.innerHTML='<div class="idle">Context passed from the app shows up here when a chat or callback reaches an agent.</div>'; return; }
+  const a = S.agent;
+  st.textContent = a.state;
+  el.innerHTML = `<div class="row">
+      <span class="pill blue">${a.channel}</span>
+      ${a.authenticated?`<span class="pill ok">${ICON.shield} Verified member · no ID&amp;V needed</span>`:""}
+      <span class="pill warn">Queue: ${a.queue}</span>
+    </div>
+    <table>${Object.entries(a.data).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table>
+    ${a.summary?`<p style="margin:10px 0 0"><b>AI summary:</b> ${a.summary}</p>`:""}`;
+}
+
+/* ---------------- phone rendering ---------------- */
+function statusBar(dark){ return `<div class="status ${dark?"dark":""}"><span>9:41</span><span>●●●● 5G ▮</span></div>`; }
+function tabbar(){
+  const t=[["home","Home",ICON.home],["messages","Messages",ICON.msg],["roadside","Roadside",ICON.tow],["account","My Account",ICON.user],["more","More",ICON.more]];
+  return `<nav class="tabbar">${t.map(([id,l,ic])=>`<button class="${S.tab===id?"on":""}" data-tab="${id}">${ic}${l}</button>`).join("")}</nav>`;
+}
+function appbar(title, back, right){
+  return `<div class="appbar">${back?`<span class="back" data-go="${back}">←</span>`:""}<span>${title}</span>${right?`<span class="right" data-go="${right[1]}">${right[0]}</span>`:""}</div>`;
+}
+function helpCard(){
+  return `<div class="help-card"><h3>Need help?</h3><p>Chat or get a call back. We already know who you are${S.rsa?" and about your roadside request":""}.</p>
+    <div class="btn-row"><button class="btn primary" data-act="chat">${ICON.chat} Chat with us</button><button class="btn ghost" data-act="callme">${ICON.phone} Call me</button></div></div>`;
+}
+
+const SCREENS = {
+  login(){
+    if(S.step===1) return `${statusBar(true)}<div class="login">
+      <div class="brand"><div class="badge">CAA</div><h2>Verify it's you</h2><p>We sent a code to the phone ending 0142</p></div>
+      <div class="card"><div class="mfa"><span>4</span><span>8</span><span>2</span><span>1</span><span>7</span><span>3</span></div>
+      <button class="btn primary" data-act="mfa">Verify</button></div></div>`;
+    return `${statusBar(true)}<div class="login">
+      <div class="brand"><div class="badge">CAA</div><h2>Welcome to CAA Mobile</h2><p>One sign-in for the app and caasco.com</p></div>
+      <div class="card">
+        <div class="field"><small>Email</small>${MEMBER.email}</div>
+        <div class="field"><small>Password</small>••••••••••</div>
+        <button class="btn primary" data-act="login">Sign in</button>
+        <div style="text-align:center;font-size:11px;color:var(--muted)">Continue as guest</div>
+      </div></div>`;
+  },
+  home(){
+    return `${statusBar()}<div class="body">
+      <div class="search">🔍 Search CAA locations, offers &amp; more</div>
+      <div class="hello">Hello ${MEMBER.name}</div>
+      <div class="balance"><div class="row"><div class="cell"><small>Current balance</small><b>${MEMBER.caaDollars}</b> <small style="display:inline">CAA Dollars</small></div>
+        <div class="cell"><small>Savings</small><b>${MEMBER.savings}</b></div></div><div class="cta">See how to earn</div></div>
+      ${S.rsa?`<div class="help-card" style="background:#fff;border-color:var(--line)" data-go="rsaStatus"><span class="pill blue">Roadside in progress</span><h3 style="margin-top:8px">Driver arriving in ~${S.rsa.eta} min</h3><p style="margin:0">Request ${S.rsa.id} · tap to track</p></div>`:""}
+      ${helpCard()}
+      <div class="section-h">Offers for you <a>See all</a></div>
+      <div class="offer"><div class="logo">HTL</div><div><small>Hotel partner</small>Members save 5% to 15%</div><span class="v">View</span></div>
+      <div class="offer"><div class="logo">RTL</div><div><small>Retail partner</small>Save up to 20%</div><span class="v">View</span></div>
+      <div class="offer"><div class="logo">DIN</div><div><small>Dining partner</small>Earn 5% in CAA Dollars</div><span class="v">View</span></div>
+    </div>${tabbar()}`;
+  },
+  messages(){
+    return `${statusBar()}${appbar("Messages")}<div class="body">
+      <div class="li"><span class="ic">${ICON.msg}</span><div><b>Winter tire season</b><br><small style="color:var(--muted)">Book a mobile tire swap at home</small></div></div>
+      <div class="li"><span class="ic">${ICON.msg}</span><div><b>New partner offer</b><br><small style="color:var(--muted)">Earn double CAA Dollars this week</small></div></div>
+      <div class="pad" style="font-size:11px;color:var(--muted)">Today this inbox is one-way. With Genesys, two-way conversations live in the chat below and continue across sessions.</div>
+      ${helpCard()}
+    </div>${tabbar()}`;
+  },
+  roadside(){
+    const items=[["mech","Mechanical problem",ICON.wrench],["battery","Battery",ICON.battery],["lock","Locked out",ICON.lock],["flat","Flat tire",ICON.tire],["fuel","Out of fuel/power",ICON.fuel],["accident","Accident",ICON.crash],["stuck","Vehicle stuck",ICON.stuck]];
+    return `${statusBar()}${appbar("Roadside Assistance",null,["CANCEL","home"])}<div class="body">
+      <div class="list-q">How can we assist you?</div>
+      ${items.map(([id,l,ic])=>`<div class="li" data-svc="${id}"><span class="ic">${ic}</span>${l}<span class="chev">›</span></div>`).join("")}
+    </div>${tabbar()}`;
+  },
+  tires(){
+    const t=(k,l)=>`<div class="tire ${S.tires[k]?"on":""}" data-tire="${k}"><span class="dot">${S.tires[k]?"✓":""}</span>${l}</div>`;
+    return `${statusBar()}${appbar("Roadside Assistance","roadside",["CANCEL","home"])}<div class="body">
+      <div class="list-q">Select each flat tire.</div>
+      <div style="display:grid;grid-template-columns:70px 120px 70px;justify-content:center;align-items:center;row-gap:60px;padding:6px 0 10px">
+        ${t("fl","Front Left")}
+        <div style="grid-row:span 2;display:flex;justify-content:center"><svg width="90" height="190" viewBox="0 0 90 190"><rect x="10" y="5" width="70" height="180" rx="30" fill="#2f5fc0"/><rect x="20" y="40" width="50" height="40" rx="8" fill="#a9c2f0"/><rect x="20" y="120" width="50" height="30" rx="8" fill="#a9c2f0"/><rect x="2" y="30" width="10" height="28" rx="3" fill="${S.tires.fl?"#e05a5a":"#333"}"/><rect x="78" y="30" width="10" height="28" rx="3" fill="${S.tires.fr?"#e05a5a":"#333"}"/><rect x="2" y="130" width="10" height="28" rx="3" fill="${S.tires.rl?"#e05a5a":"#333"}"/><rect x="78" y="130" width="10" height="28" rx="3" fill="${S.tires.rr?"#e05a5a":"#333"}"/></svg></div>
+        ${t("fr","Front Right")}${t("rl","Rear Left")}${t("rr","Rear Right")}
+      </div>
+      <div class="radio ${!S.spare?"on":""}" data-spare="0">Tires just need air<span class="r"></span></div>
+      <div class="radio ${S.spare?"on":""}" data-spare="1">I have a spare tire<span class="r"></span></div>
+      <div class="pad"><button class="btn primary" style="width:100%" data-go="location">Confirm</button></div>
+    </div>`;
+  },
+  location(){
+    return `${statusBar()}${appbar("Confirm your location","tires")}<div class="body">
+      <div class="map"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice">
+        <rect width="360" height="250" fill="#e9efe4"/><rect x="230" y="20" width="120" height="90" fill="#cfe5c4"/>
+        <path d="M-10 150 L370 120" stroke="#f3c96a" stroke-width="18"/><path d="M-10 150 L370 120" stroke="#fff" stroke-width="2" stroke-dasharray="10 8"/>
+        <path d="M150 -10 L170 260" stroke="#fff" stroke-width="10"/><path d="M40 -10 L70 260" stroke="#fff" stroke-width="7"/>
+        <text x="250" y="112" font-size="10" fill="#8a7a3a">HWY 401</text><text x="176" y="40" font-size="9" fill="#888">KENNEDY RD</text>
+        <circle cx="168" cy="136" r="22" fill="rgba(37,84,163,.18)"/><circle cx="168" cy="136" r="8" fill="#2554a3" stroke="#fff" stroke-width="3"/>
+      </svg></div>
+      <div class="addr"><b>${MEMBER.place}</b>GPS ${MEMBER.lat}, ${MEMBER.lng} · accuracy 8 m</div>
+      <div class="addr"><b>Vehicle</b>${MEMBER.vehicle} · ${MEMBER.plate}</div>
+      <div class="pad"><button class="btn primary" style="width:100%" data-act="submitRsa">Request assistance</button></div>
+    </div>`;
+  },
+  rsaStatus(){
+    const r=S.rsa;
+    return `${statusBar()}${appbar("Roadside status","home")}<div class="body">
+      <div class="status-card"><span class="pill ok">Driver assigned</span>
+        <div class="eta" style="margin-top:8px">~${r.eta} min</div><div style="font-size:12px;color:var(--muted)">Estimated arrival · Flat tire, spare available</div>
+        <div class="steps"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <div class="kv">Request <b>${r.id}</b></div><div class="kv">Location <b>Hwy 401 E @ Kennedy</b></div><div class="kv">Vehicle <b>${MEMBER.vehicle}</b></div>
+        <button class="btn ghost" style="width:100%;margin-top:8px">Share my status</button>
+      </div>
+      ${helpCard()}
+    </div>${tabbar()}`;
+  },
+  account(){
+    return `${statusBar()}<div class="body">
+      <div class="acct-head plus"><h2>Welcome back,<br>${MEMBER.name}!</h2><p><span class="pill ok" style="background:#fff">● Active membership</span></p><p>Level: ${MEMBER.level} · Member since ${MEMBER.since}</p></div>
+      <div class="balance" style="margin-top:12px"><div class="row"><div class="cell"><small>Current balance</small><b>${MEMBER.caaDollars}</b></div><div class="cell"><small>Savings</small><b>${MEMBER.savings}</b></div></div><div class="cta">See how to earn</div></div>
+      <div class="section-h">Profile</div>
+      <div class="li" data-go="card"><span class="ic">${ICON.user}</span>Membership card<span class="chev">›</span></div>
+      <div class="li"><span class="ic">${ICON.user}</span>Personal information<span class="chev">›</span></div>
+      <div class="li"><span class="ic">${ICON.tow}</span>My vehicles<span class="chev">›</span></div>
+      <div class="li" data-act="chat"><span class="ic">${ICON.msg}</span>Contact us<span class="chev">›</span></div>
+    </div>${tabbar()}`;
+  },
+  card(){
+    return `${statusBar()}${appbar("My membership card","account")}<div class="body">
+      <div class="mcard plus"><small>CAA South Central Ontario</small><h2>${MEMBER.fullName}</h2><small>${MEMBER.level} Membership</small>
+        <div class="num">${MEMBER.memberNumber}</div><small>Member since ${MEMBER.since} · Valid through 06/2027</small></div>
+      <div class="pad"><button class="btn primary" style="width:100%;background:#000">Add to Wallet</button></div>
+    </div>`;
+  },
+  more(){
+    return `${statusBar()}${appbar("More")}<div class="body">
+      <div class="li"><span class="ic">${ICON.home}</span>Find a CAA branch<span class="chev">›</span></div>
+      <div class="li"><span class="ic">${ICON.wrench}</span>Approved Auto Repair<span class="chev">›</span></div>
+      <div class="li"><span class="ic">${ICON.more}</span>Gift cards<span class="chev">›</span></div>
+      <div class="li" data-act="chat"><span class="ic">${ICON.msg}</span>Chat with us<span class="chev">›</span></div>
+      <div class="li" data-act="callme"><span class="ic">${ICON.tow}</span>Request a call back<span class="chev">›</span></div>
+      ${presenterPanel()}
+    </div>${tabbar()}`;
+  },
+  chat(){
+    const msgs=S.chat.map(m=> m.sys?`<div class="sys">${m.text}</div>`:`<div class="msg ${m.who}">${m.label?`<span class="who">${m.label}</span>`:""}${m.text}</div>`).join("");
+    const qrs = S.escalated ? [] : (S.rsa ? ["Where is my driver?","Can I cancel?","Talk to a person"] : ["What does Plus cover?","Renew my membership","Talk to a person"]);
+    return `${statusBar()}${appbar("Chat with CAA","home",["CALL ME","callme"])}
+      <div class="authbar">${ICON.shield} Signed in as ${MEMBER.fullName} · secure, verified session</div>
+      <div class="chat" id="chatlog">${msgs}</div>
+      ${qrs.length?`<div class="qr">${qrs.map(q=>`<button data-qr="${q}">${q}</button>`).join("")}</div>`:""}
+      <div class="composer"><input id="chatin" placeholder="Type a message"><button data-act="send">Send</button></div>`;
+  },
+  callme(){
+    const cb=S.callback;
+    if(cb) return `${statusBar()}${appbar("Call me","home")}<div class="body">
+      <div class="status-card"><span class="pill ok">Call back requested</span><div class="eta" style="margin-top:8px">~${cb.wait} min</div>
+        <div style="font-size:12px;color:var(--muted)">An agent will call ${callNumber()}. Keep the app open or closed — we'll ring your phone.</div>
+        <div class="kv">Reference <b>${cb.ref}</b></div><div class="kv">Topic <b>${cb.topic}</b></div>
+      </div>
+      ${cb.live
+        ? `<div class="pad" style="font-size:12px;color:var(--muted);text-align:center">Live callback created in Genesys Cloud.<br>Your phone rings when the agent accepts.</div>`
+        : `<div class="pad"><button class="btn primary" style="width:100%" data-act="ring">▶ Simulate agent calling now</button></div>`}
+    </div>`;
+    return `${statusBar()}${appbar("Call me","home")}<div class="body">
+      <div class="list-q">We'll call you</div>
+      <div class="pad" style="padding-top:0;font-size:12px;color:var(--muted)">No hold music, no repeating your details. The agent gets your account${S.rsa?" and roadside request":""} before they dial.</div>
+      <div class="pad" style="display:flex;flex-direction:column;gap:10px;padding-top:0">
+        <div class="field"><small>Call me at</small>${callNumber()}</div>
+        <div class="field"><small>What's it about?</small>${S.rsa?"My roadside request "+S.rsa.id:"Membership question"}</div>
+        <div class="field"><small>When</small>As soon as possible</div>
+        <button class="btn primary" data-act="submitCb">${ICON.phone} Call me${isLive()?'<span class="livebadge">LIVE</span>':""}</button>
+      </div>
+    </div>`;
+  },
+  oncall(){
+    return `<div class="ring" style="justify-content:flex-start;gap:14px"><div class="avatar" style="margin-top:20px">CAA</div><h2>CAA Member Care</h2><p>Priya · 00:${String(S.secs||4).padStart(2,"0")}</p>
+      <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px;font-size:13px;line-height:1.45;margin-top:20px">“Hi Alex, it's Priya from CAA. I can see your flat tire request on the 401 and your driver is about ${S.rsa?S.rsa.eta-4:20} minutes out. How can I help?”</div>
+      <div style="flex:1"></div><div class="acts"><button style="background:var(--red)" data-act="hang">✕</button></div></div>`;
+  }
+};
+
+function render(){
+  const sc=document.getElementById("screen");
+  let html = SCREENS[S.screen]();
+  if(S.ringing) html += `<div class="ring"><div style="text-align:center"><div class="avatar pulse" style="margin:0 auto">CAA</div><h2>CAA Member Care</h2><p>Calling ${MEMBER.phone}</p></div><div class="acts"><button style="background:var(--red)" data-act="decline">✕</button><button style="background:var(--ok)" data-act="answer">✆</button></div></div>`;
+  if(S.toast) html += `<div class="toast"><div class="ti">CAA</div><div><b>${S.toast[0]}</b><br>${S.toast[1]}</div></div>`;
+  sc.innerHTML = html;
+  const cl=document.getElementById("chatlog"); if(cl) cl.scrollTop=cl.scrollHeight;
+  const ci=document.getElementById("chatin"); if(ci) ci.addEventListener("keydown",e=>{if(e.key==="Enter")send(ci.value)});
+}
+function go(s){ S.screen=s; if(["home","messages","roadside","account","more"].includes(s)) S.tab=s; render(); }
+function later(ms,fn){ setTimeout(()=>{fn(); render();},ms); }
+
+/* ---------------- actions ---------------- */
+function doLogin(){
+  log({from:["app","idp"],title:"Member signs in with CAA credentials (OIDC + PKCE)",
+    ep:"GET https://login.caa.example/authorize?response_type=code&amp;scope=openid profile member&amp;code_challenge=…",
+    why:"Same sign-in as today. CAA's identity provider stays the system of record for member identity.",
+    body:{client_id:"caa-mobile-app",redirect_uri:"ca.caa.mobile://auth/callback",scope:"openid profile member",code_challenge_method:"S256",login_hint:MEMBER.email}});
+  S.step=1; render();
+}
+function doMfa(){
+  log({from:["idp","app"],title:"MFA passed — authorization code returned to the app",
+    why:"The app holds only CAA's own tokens. No Genesys secret ever lives on the phone.",
+    body:{code:"SplxlOBeZQQYbYS6WxSbIA",state:"af0ifjsldkj"}});
+  S.authed=true; S.screen="home"; S.tab="home"; render();
+  later(500,()=>{
+    log({from:["app","sdk"],title:"App initializes Genesys Mobile Messenger SDK and authorizes it",
+      ep:"MessengerAccount(deploymentId, domain) · client.authorize(authCode, redirectUri, codeVerifier)",
+      why:"The SDK hands the OIDC code to Genesys Cloud. Genesys validates it with CAA's IdP, so the chat is tied to a verified member.",
+      label:"SDK call (illustrative)",
+      body:`// Android (Kotlin) — illustrative
+val account = MessengerAccount(
+  deploymentId = "3f6c…-caa-member-app",
+  domain = "cac1.pure.cloud"        // Canada region
+)
+val client = MobileMessenger.createMessagingClient(context, account)
+client.authorize(
+  authCode     = "SplxlOBeZQQYbYS6WxSbIA",
+  redirectUri  = "ca.caa.mobile://auth/callback",
+  codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+)`});
+    later(700,()=>{
+      log({from:["sdk","gc","idp"],title:"Genesys Cloud exchanges the code with CAA's IdP and opens an authenticated session",
+        ep:"POST /api/v2/webdeployments/token/oauthcodegrantjwtexchange → <b>200 OK</b>",
+        why:"Result: a Genesys session JWT bound to the member's verified identity. Conversation history follows the member across devices.",
+        body:{request:{deploymentId:"3f6c…-caa-member-app",oauth:{code:"SplxlOBeZQQYbYS6WxSbIA",redirectUri:"ca.caa.mobile://auth/callback",codeVerifier:"dBjftJeZ4CVP…"}},
+          response:{jwt:"eyJhbGciOiJSUzI1NiIs…",refreshToken:"0b1e…",externalId:"sub:caa|6202794000044173",verified:true}}});
+      S.sdkReady=true;
+    });
+  });
+}
+function submitRsa(){
+  const svc = "Flat tire";
+  S.rsa={id:"RSA-24-0918832",eta:38,service:svc};
+  log({from:["app","be"],title:"Roadside request created in CAA dispatch (existing system)",
+    ep:"POST https://api.caa.example/roadside/v1/requests → <b>201 Created</b>",
+    why:"Unchanged CAA integration. The app keeps the request ID so it can hand it to Genesys if the member reaches out.",
+    body:{request:{memberNumber:MEMBER.memberNumber.replace(/ /g,""),service:"FLAT_TIRE",tires:Object.keys(S.tires).filter(k=>S.tires[k]),spareAvailable:S.spare,
+      location:{lat:MEMBER.lat,lng:MEMBER.lng,description:MEMBER.place},vehicle:{desc:MEMBER.vehicle,plate:MEMBER.plate}},
+      response:{requestId:S.rsa.id,status:"DRIVER_ASSIGNED",etaMinutes:38}}});
+  go("rsaStatus");
+}
+function attrs(){
+  return { memberNumber:MEMBER.memberNumber.replace(/ /g,""), membershipLevel:MEMBER.level, memberSince:MEMBER.since,
+    preferredLanguage:"en-CA", entryPoint:S.screen==="rsaStatus"?"roadside_status":"home",
+    ...(S.rsa?{rsaRequestId:S.rsa.id,rsaStatus:"DRIVER_ASSIGNED",rsaService:"FLAT_TIRE",rsaEtaMinutes:String(S.rsa.eta)}:{}),
+    vehicle:MEMBER.vehicle, gpsLat:String(MEMBER.lat), gpsLng:String(MEMBER.lng), appVersion:"3.0.0", platform:"android" };
+}
+function openChat(){
+  const from = S.screen;
+  S.screen="chat";
+  if(!S.chatStarted){
+    S.chatStarted=true;
+    S.chat.push({sys:true,text:"Secure chat · verified member"});
+    log({from:["app","sdk"],title:"App attaches member context as custom attributes",
+      ep:"client.customAttributesStore.add(attributes)",
+      why:"Sent with the first message. Architect, the AI agent and the human agent all read the same values — the member is never asked for them.",
+      label:"Custom attributes (illustrative)", body:attrs()});
+    later(600,()=>{
+      log({from:["sdk","gc"],title:"Conversation starts on the authenticated session",
+        ep:"client.connectAuthenticatedSession() · sendMessage(\"…\") → inbound message flow \"CAA Member App\"",
+        body:{type:"Text",direction:"Inbound",channel:{platform:"Genesys Mobile Messenger",from:{nickname:MEMBER.fullName,authenticated:true}},
+          channel_metadata:{customAttributes:attrs()}}});
+      later(600,()=>{
+        log({from:["gc","flow"],title:"Architect reads attributes and routes to the Roadside AI agent",
+          why:S.rsa?"An open roadside request takes the member straight to roadside help, at Plus priority.":"No open request: member goes to the general Member Care AI agent.",
+          body:{flow:"CAA Member App - Inbound Message",decision:S.rsa?"Message.customAttributes.rsaRequestId != empty → Roadside AI agent":"→ Member Care AI agent",
+            setParticipantData:{memberLevel:MEMBER.level,rsaRequestId:S.rsa?S.rsa.id:null},priority:MEMBER.level==="Plus"?20:10}});
+        S.chat.push({who:"bot",label:"CAA Virtual Assistant",text: S.rsa
+          ? `Hi ${MEMBER.name}. I can see your flat tire request ${S.rsa.id} on Hwy 401 — your driver is about ${S.rsa.eta} minutes away. How can I help?`
+          : `Hi ${MEMBER.name}, thanks for being a ${MEMBER.level} member since ${MEMBER.since}. What can I help you with today?`});
+      });
+    });
+  }
+  render();
+}
+function botReply(q){
+  const t=q.toLowerCase();
+  if(t.includes("person")||t.includes("agent")||t.includes("human")) return escalate();
+  if(t.includes("driver")||t.includes("where")){
+    log({from:["flow","be"],title:"AI agent calls a data action for live request status",
+      ep:"Data action \"Get Roadside Status\" → GET https://api.caa.example/roadside/v1/requests/"+(S.rsa?S.rsa.id:"…"),
+      body:{input:{requestId:S.rsa?S.rsa.id:null},output:{status:"EN_ROUTE",etaMinutes:31,driverFirstName:"Marco",truck:"Unit 418"}}});
+    if(S.rsa) S.rsa.eta=31;
+    return `Marco is on the way in truck 418 and should arrive in about 31 minutes. Stay in your vehicle with hazards on if it's safe. Want me to send you a text when he's 5 minutes out?`;
+  }
+  if(t.includes("cancel")) return `I can cancel ${S.rsa?S.rsa.id:"the request"} for you. Cancelling doesn't count against your ${MEMBER.level} service calls if the driver hasn't arrived. Do you want me to go ahead?`;
+  if(t.includes("plus")||t.includes("cover")) return `Plus includes towing up to 200 km and 4 service calls a year. Want details on battery or fuel delivery?`;
+  if(t.includes("renew")) return `Your ${MEMBER.level} membership renews in June. I can turn on auto-renewal or connect you with someone to change your level.`;
+  return `I can help with your roadside request, membership, billing or rewards. You can also tap "Talk to a person" any time.`;
+}
+function escalate(){
+  S.escalated=true;
+  log({from:["flow","gc"],title:"AI agent hands off to a person with full context",
+    ep:"Transfer to ACD → queue \"Roadside - Member Care\" · skill: Roadside · priority 20",
+    why:"The summary and attributes travel with the interaction. No repeat questions, no re-authentication.",
+    body:{queue:"Roadside - Member Care",skills:["Roadside","English"],priority:20,
+      participantData:{...attrs(),aiSummary:"Member on Hwy 401 with a flat tire; driver ETA ~31 min. Asked for a person."}}});
+  S.agent={state:"Chat · connected to Priya",channel:"In-app message",authenticated:true,queue:"Roadside - Member Care",
+    data:{"Member":MEMBER.fullName,"memberNumber":MEMBER.memberNumber,"membershipLevel":MEMBER.level+" (since "+MEMBER.since+")",
+      ...(S.rsa?{"rsaRequestId":S.rsa.id,"rsaStatus":"EN_ROUTE · ETA "+S.rsa.eta+" min"}:{}),"vehicle":MEMBER.vehicle,"location":MEMBER.place,"entryPoint":"Mobile app"},
+    summary:"Member on Hwy 401 with a flat tire, spare available. Driver en route. Asked for a person."};
+  renderAgent();
+  later(900,()=>{
+    S.chat.push({sys:true,text:"Priya from CAA joined"});
+    S.chat.push({who:"agent",label:"Priya · CAA Member Care",text:`Hi ${MEMBER.name}, I have your request in front of me. Marco is about 31 minutes out. What can I do for you?`});
+  });
+  return `Connecting you with a member care specialist. They'll see everything we've discussed.`;
+}
+function send(text){
+  text=(text||"").trim(); if(!text) return;
+  S.chat.push({who:"me",text});
+  log({from:["app","sdk","gc"],title:"Member message sent",ep:"client.sendMessage(text)",body:{text}});
+  render();
+  later(700,()=>{ const r=botReply(text); if(r) S.chat.push({who:S.escalated&&!r.startsWith("Connecting")?"agent":"bot",label:S.escalated&&!r.startsWith("Connecting")?"Priya · CAA Member Care":"CAA Virtual Assistant",text:r}); });
+}
+function submitCb(){
+  const ref="CB-"+Math.floor(100000+Math.random()*899999);
+  log({from:["app","be"],title:"App asks CAA's API gateway for a call back",
+    ep:"POST https://api.caa.example/contact/v1/callbacks (member access token)",
+    why:"The app never holds Genesys API credentials. CAA's gateway validates the member token, then calls Genesys server-to-server.",
+    body:{phone:MEMBER.phone,topic:S.rsa?"ROADSIDE_FOLLOWUP":"MEMBERSHIP",asap:true}});
+  later(600,()=>{
+    log({from:["be","gc"],title:"Gateway creates the callback in Genesys Cloud",
+      ep:"POST /api/v2/conversations/callbacks → <b>200 OK</b>",
+      why:"A real voice callback: queued like a call, routed by skill and priority, dialled when an agent accepts.",
+      label:"Request / response",
+      body:{request:{routingData:{queueId:"9b1c…roadside-member-care",priority:20,skillIds:["roadside","english"]},
+        scriptId:"caa-member-callback-script",callbackUserName:MEMBER.fullName,callbackNumbers:[MEMBER.phone.replace(/[ -]/g,"")],
+        countryCode:"CA",data:{...attrs(),callbackReason:S.rsa?"Roadside follow-up":"Membership",requestedFrom:"mobile_app"}},
+        response:{conversation:{id:"c7a2…f19"},callbackIdentifiers:[{type:"EXTERNAL",id:ref}]}}});
+    S.callback={ref,wait:3,topic:S.rsa?"Roadside "+S.rsa.id:"Membership"};
+    S.agent={state:"Callback · waiting in queue",channel:"Voice callback",authenticated:true,queue:"Roadside - Member Care",
+      data:{"Member":MEMBER.fullName,"callbackNumber":MEMBER.phone,"memberNumber":MEMBER.memberNumber,"membershipLevel":MEMBER.level,
+        ...(S.rsa?{"rsaRequestId":S.rsa.id,"rsaStatus":"DRIVER_ASSIGNED · ETA "+S.rsa.eta+" min"}:{}),"vehicle":MEMBER.vehicle,"location":MEMBER.place,"requestedFrom":"Mobile app"}};
+    renderAgent();
+  });
+}
+function ring(){
+  log({from:["gc","agent"],title:"Agent accepts the callback; script shows the member's context",
+    why:"Priya sees who she's calling and why before the phone rings.",
+    body:{agent:"Priya",action:"accept",scriptId:"caa-member-callback-script",screenPop:attrs()}});
+  S.agent.state="Callback · dialling member";
+  renderAgent();
+  later(700,()=>{
+    log({from:["gc","app"],title:"Genesys Cloud dials the member's phone",ep:"Outbound call → "+MEMBER.phone});
+    S.ringing=true;
+  });
+}
+
+/* ---------------- event wiring ---------------- */
+document.getElementById("screen").addEventListener("click",e=>{
+  const t=e.target.closest("[data-tab],[data-go],[data-act],[data-svc],[data-tire],[data-spare],[data-qr]"); if(!t) return;
+  const d=t.dataset;
+  if(d.tab) return go(d.tab==="roadside"&&S.rsa?"rsaStatus":d.tab);
+  if(d.go) return go(d.go);
+  if(d.svc){ if(d.svc==="flat") return go("tires"); S.toast=["Demo path","Use “Flat tire” for this walkthrough"]; render(); return later(1800,()=>S.toast=null); }
+  if(d.tire){ S.tires[d.tire]=!S.tires[d.tire]; return render(); }
+  if(d.spare){ S.spare=d.spare==="1"; return render(); }
+  if(d.qr) return send(d.qr);
+  switch(d.act){
+    case "login": return doLogin();
+    case "mfa": return doMfa();
+    case "submitRsa": return submitRsa();
+    case "chat": return WEB.ready() ? WEB.open() : openChat();
+    case "callme": return go("callme");
+    case "submitCb": return (isLive() && GC.token()) ? submitCbLive() : submitCb();
+    case "gcConnect": return GC.login();
+    case "gcPaste": { const v=(document.getElementById("gcpaste")||{}).value; if(v&&v.trim()){ GC.set(v.trim()); } return render(); }
+    case "gcForget": GC.clear(); return render();
+    case "resetDemo": return init();
+    case "ring": return ring();
+    case "send": { const i=document.getElementById("chatin"); return send(i&&i.value); }
+    case "answer": S.ringing=false; S.screen="oncall"; S.agent.state="Voice · connected to Priya"; renderAgent();
+      log({from:["agent","app"],title:"Call connected — agent already has full context",why:"No IVR, no ID&V, no repeating the request number."});
+      return render();
+    case "decline": S.ringing=false; return render();
+    case "hang": S.screen="home"; S.tab="home"; S.agent.state="Wrap-up"; renderAgent();
+      log({from:["agent","gc"],title:"Interaction ends; attributes and summary stay on the conversation record",why:"Available for reporting, quality review and the member's next contact."});
+      return render();
+  }
+});
+document.getElementById("reset").addEventListener("click",init);
+
+/* ---------------- going live: work items ---------------- */
+const WORK = [
+  ["Create queue <b>CAA Demo – Member Care</b>; add the demo agent(s); set callback caller ID and auto-dial behaviour","Genesys admin","Star Telecom",0.5],
+  ["Build a callback script that shows <code>memberNumber</code>, <code>membershipLevel</code>, <code>rsaRequestId</code>, <code>rsaStatus</code>, <code>vehicle</code> from participant attributes","Scripter","Star Telecom",1],
+  ["Create an OAuth client: <b>Code Authorization + PKCE</b> <span class=\"verify\">verify grant name</span>; redirect URI = the GitHub Pages URL","Genesys admin","Star Telecom",0.25],
+  ["Create a role with only <code>Conversation &gt; Callback &gt; Create</code> <span class=\"verify\">verify permission</span>; assign to a presenter demo user (not an agent)","Genesys admin","Star Telecom",0.25],
+  ["Confirm an outbound-capable number (Genesys Cloud Voice or BYOC) dials Canadian mobiles","Telephony","Star Telecom",0.5],
+  ["Page: add a Mock / Live switch and a settings block (region, client ID, queue ID, script ID, phone to call)","This page","Star Telecom",0.5],
+  ["Page: PKCE sign-in for the presenter; keep the token in memory only","This page","Star Telecom",1],
+  ["Page: swap the mocked <code>submitCb()</code> for the live POST; show the real request and response in the inspector; fall back to mock on any error","This page","Star Telecom",1],
+  ["GitHub: repo, rename to <code>index.html</code>, enable Pages, set repo visibility (see risks)","GitHub","Star Telecom",0.5],
+  ["Dry run end to end: Call me → agent accepts → presenter's phone rings → script shows data. Repeat from the venue network","Demo","Star Telecom",1]
+];
+let WORKDONE = {};
+try { WORKDONE = JSON.parse(localStorage.getItem("golive-work")||"{}"); } catch(e) {}
+function renderWork(){
+  const done = WORK.filter((_,i)=>WORKDONE[i]).length;
+  document.getElementById("worklist").innerHTML = WORK.map(([t,w,o,h],i)=>
+    `<tr class="${WORKDONE[i]?"done":""}"><td>${i+1}</td><td>${t}</td><td class="where">${w}</td><td>${o}</td><td>${h} h</td>
+     <td><input type="checkbox" data-wk="${i}" ${WORKDONE[i]?"checked":""} aria-label="Mark task ${i+1} done"></td></tr>`).join("");
+  document.getElementById("wktotal").textContent = WORK.reduce((a,w)=>a+w[3],0)+" h";
+  document.getElementById("wkprog").textContent = `${done} of ${WORK.length} done`;
+  document.getElementById("wkbar").style.width = (done/WORK.length*100)+"%";
+}
+document.getElementById("worklist").addEventListener("change",e=>{
+  const i=e.target.dataset.wk; if(i===undefined) return;
+  WORKDONE[i]=e.target.checked;
+  try { localStorage.setItem("golive-work",JSON.stringify(WORKDONE)); } catch(err) {}
+  renderWork();
+});
+renderWork();
+
+function codeHl(src){ return src.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/(^|\s)(\/\/[^\n]*)/gm,'$1<span class="c">$2</span>'); }
+document.getElementById("liveconfig").innerHTML = codeHl(`// Settings block (placeholders — fill on the demo org)
+const LIVE = {
+  mode: "mock",                    // "mock" | "live"
+  region: "cac1.pure.cloud",       // Canada region
+  clientId: "<PKCE client ID>",    // safe to commit, no secret
+  redirectUri: "https://<org>.github.io/<repo>/",
+  queueId: "<CAA Demo – Member Care queue ID>",
+  scriptId: "<callback script ID>",
+  callbackNumber: "+1<presenter mobile>"
+};`);
+
+document.getElementById("livecode").innerHTML = codeHl(`// Live "Call me" — replaces the mocked submitCb()
+async function submitCbLive(token) {
+  const body = {
+    queueId: LIVE.queueId,
+    scriptId: LIVE.scriptId,
+    callbackUserName: MEMBER.fullName,
+    callbackNumbers: [LIVE.callbackNumber],
+    countryCode: "CA",
+    data: attrs()                  // same context the mock shows
+  };
+  log({ from: ["app","gc"], title: "LIVE: create callback",
+        ep: "POST /api/v2/conversations/callbacks", body });
+  const res = await fetch(\`https://api.\${LIVE.region}/api/v2/conversations/callbacks\`, {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + token,
+               "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  if (!res.ok) { log({ from: ["gc","app"], title: "LIVE failed — falling back to mock", body: json });
+                 return submitCb(); }
+  log({ from: ["gc","app"], title: "LIVE: callback queued (" + res.status + ")", body: json });
+}`);
+/* ---------------- live mode: config + Genesys sign-in ---------------- */
+const LIVE = Object.assign({mode:"mock",region:"cac1.pure.cloud",grant:"pkce"}, window.DEMO_CONFIG||{});
+function isLive(){ return LIVE.mode==="live" && !!LIVE.clientId && !!LIVE.queueId && !!LIVE.callbackNumber; }
+function callNumber(){
+  if(LIVE.mode!=="live" || !LIVE.callbackNumber) return MEMBER.phone;
+  const d=LIVE.callbackNumber.replace(/\D/g,"");
+  return d.length===11 ? `+${d[0]} ${d.slice(1,4)}-${d.slice(4,7)}-${d.slice(7)}` : LIVE.callbackNumber;
+}
+const ss = { get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},
+             set:(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}},
+             del:k=>{try{sessionStorage.removeItem(k)}catch(e){}} };
+const GC = {
+  _t:null,
+  redirect(){ return LIVE.redirectUri || (location.origin + location.pathname); },
+  token(){ return this._t || ss.get("gc_token"); },
+  set(t){ this._t=t; ss.set("gc_token",t); },
+  clear(){ this._t=null; ss.del("gc_token"); },
+  async login(){
+    if(!LIVE.clientId){ alertToast("Add clientId to config.js first"); return; }
+    const base=`https://login.${LIVE.region}/oauth/authorize?client_id=${encodeURIComponent(LIVE.clientId)}&redirect_uri=${encodeURIComponent(this.redirect())}`;
+    if(LIVE.grant==="implicit"){ location.href = base+"&response_type=token"; return; }
+    const rnd=new Uint8Array(32); crypto.getRandomValues(rnd);
+    const verifier=b64url(rnd); ss.set("gc_verifier",verifier);
+    const challenge=b64url(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier))));
+    location.href = base+`&response_type=code&code_challenge=${challenge}&code_challenge_method=S256`;
+  },
+  async handleReturn(){
+    const h=new URLSearchParams(location.hash.slice(1)), q=new URLSearchParams(location.search);
+    if(h.get("access_token")){ this.set(h.get("access_token")); history.replaceState(null,"",this.redirect()+(document.body.classList.contains("app-mode")?"?app=1":"")); return; }
+    if(q.get("code") && ss.get("gc_verifier")){
+      try{
+        const res=await fetch(`https://login.${LIVE.region}/oauth/token`,{method:"POST",
+          headers:{"Content-Type":"application/x-www-form-urlencoded"},
+          body:new URLSearchParams({grant_type:"authorization_code",code:q.get("code"),redirect_uri:this.redirect(),
+            client_id:LIVE.clientId,code_verifier:ss.get("gc_verifier")})});
+        const j=await res.json(); if(j.access_token) this.set(j.access_token);
+      }catch(e){ console.warn("Token exchange failed",e); }
+      ss.del("gc_verifier"); history.replaceState(null,"",this.redirect()+(document.body.classList.contains("app-mode")?"?app=1":""));
+    }
+  }
+};
+function b64url(bytes){ return btoa(String.fromCharCode(...bytes)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function alertToast(msg){ S.toast=["Presenter",msg]; render(); setTimeout(()=>{S.toast=null;render();},2200); }
+function presenterPanel(){
+  const t=GC.token();
+  return `<div class="presenter"><h4>Presenter tools</h4>
+    <div class="kv">Mode <b>${LIVE.mode==="live"?(isLive()?"Live callback":"Live (config incomplete)"):"Mock"}</b></div>
+    <div class="kv">Genesys sign-in <b>${t?"Connected":"Not connected"}</b></div>
+    <div class="kv">Calls <b>${callNumber()}</b></div>
+    ${LIVE.mode==="live"?(t
+      ? `<button class="btn ghost" style="width:100%" data-act="gcForget">Disconnect Genesys</button>`
+      : `<button class="btn primary" style="width:100%" data-act="gcConnect">Connect Genesys (${LIVE.grant})</button>
+         <textarea id="gcpaste" rows="2" placeholder="…or paste an access token"></textarea>
+         <button class="btn ghost" style="width:100%" data-act="gcPaste">Use pasted token</button>`):""}
+    <button class="btn ghost" style="width:100%" data-act="resetDemo">Reset demo</button></div>`;
+}
+async function submitCbLive(){
+  const ref="CB-"+Math.floor(100000+Math.random()*899999);
+  const body={ queueId:LIVE.queueId, callbackUserName:LIVE.callbackUserName||MEMBER.fullName,
+    callbackNumbers:[LIVE.callbackNumber], countryCode:"CA",
+    data:{...attrs(),callbackReason:S.rsa?"Roadside follow-up":"Membership",requestedFrom:"mobile_app",demoRef:ref} };
+  if(LIVE.scriptId) body.scriptId=LIVE.scriptId;
+  if(LIVE.callerId) body.callerId=LIVE.callerId;
+  if(LIVE.callerIdName) body.callerIdName=LIVE.callerIdName;
+  log({from:["app","gc"],title:"LIVE: create callback in Genesys Cloud",ep:"POST https://api."+LIVE.region+"/api/v2/conversations/callbacks",label:"Request",body});
+  S.toast=["Requesting call back","Contacting Genesys Cloud…"]; render();
+  try{
+    const res=await fetch(`https://api.${LIVE.region}/api/v2/conversations/callbacks`,{method:"POST",
+      headers:{"Authorization":"Bearer "+GC.token(),"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const json=await res.json().catch(()=>({}));
+    S.toast=null;
+    if(!res.ok) throw Object.assign(new Error("HTTP "+res.status),{json});
+    log({from:["gc","app"],title:"LIVE: callback queued ("+res.status+" OK)",ep:"conversation "+((json.conversation||{}).id||""),label:"Response",body:json});
+    S.callback={ref,wait:2,topic:S.rsa?"Roadside "+S.rsa.id:"Membership",live:true};
+    S.agent={state:"Live callback · waiting in queue",channel:"Voice callback",authenticated:true,queue:"CAA Demo – Member Care",
+      data:{"Member":body.callbackUserName,"callbackNumber":callNumber(),"memberNumber":MEMBER.memberNumber,"membershipLevel":MEMBER.level,
+        ...(S.rsa?{"rsaRequestId":S.rsa.id}:{}),"vehicle":MEMBER.vehicle,"location":MEMBER.place,"requestedFrom":"Mobile app"}};
+    renderAgent(); render();
+  }catch(e){
+    S.toast=null;
+    if(e.status===401||String(e.message).includes("401")) GC.clear();
+    log({from:["gc","app"],title:"LIVE failed ("+e.message+") — running the mock instead",body:e.json||{error:String(e)}});
+    submitCb();
+  }
+}
+
+/* ---------------- Genesys Web Messenger (chat) ---------------- */
+const WEB = {
+  loaded:false, dbReady:false,
+  cfg(){ return Object.assign({chat:"mock",environment:"prod-cac1",deploymentId:""}, LIVE.webMessenger||{}); },
+  enabled(){ const c=this.cfg(); return c.chat==="web" && !!c.deploymentId; },
+  ready(){ return this.enabled() && this.loaded && typeof window.Genesys==="function"; },
+  load(){
+    if(!this.enabled()) return;
+    const c=this.cfg(), region=c.environment.replace(/^prod-/,"");
+    const host = region==="prod" ? "apps.mypurecloud.com" : `apps.${LIVE.region}`;
+    (function (g, e, n, es, ys) {
+      g["_genesysJs"] = e; g[e] = g[e] || function () { (g[e].q = g[e].q || []).push(arguments); };
+      g[e].t = 1 * new Date(); g[e].c = es;
+      ys = document.createElement("script"); ys.async = 1; ys.src = n; ys.charset = "utf-8";
+      ys.onload = () => { WEB.loaded=true; }; ys.onerror = () => { WEB.loaded=false; console.warn("Web Messenger failed to load; using mock chat"); };
+      document.head.appendChild(ys);
+    })(window, "Genesys", `https://${host}/genesys-bootstrap/genesys.min.js`, { environment: c.environment, deploymentId: c.deploymentId });
+    Genesys("subscribe","Database.ready",()=>{ WEB.dbReady=true; WEB.setAttrs(); });
+    Genesys("subscribe","Messenger.opened",()=>log({from:["sdk","app"],title:"Web Messenger opened"}));
+    Genesys("subscribe","MessagingService.conversationStarted",()=>log({from:["sdk","gc"],title:"Web Messenger: conversation started",
+      why:"Custom attributes go with the first message to the inbound message flow."}));
+    Genesys("subscribe","MessagingService.messagesReceived",(m)=>{
+      const msgs=((m&&m.data&&m.data.messages)||[]).filter(x=>x.direction==="Outbound");
+      if(msgs.length) log({from:["gc","app"],title:"Web Messenger: reply received",body:{text:msgs.map(x=>x.text).join(" | ")}});
+    });
+  },
+  setAttrs(){
+    if(!this.ready()) return;
+    const a=attrs();
+    Genesys("command","Database.set",{messaging:{customAttributes:a}});
+    return a;
+  },
+  open(){
+    const a=this.setAttrs();
+    log({from:["app","sdk"],title:"LIVE: member context set on Web Messenger",ep:'Genesys("command","Database.set",{messaging:{customAttributes}})',
+      why:"Unauthenticated web messaging: the context reaches Architect and the agent, but it isn't verified identity.",label:"Custom attributes",body:a});
+    Genesys("command","Messenger.open",{},
+      ()=>log({from:["app","sdk"],title:"LIVE: Web Messenger opened",ep:'Genesys("command","Messenger.open")'}),
+      ()=>{ log({from:["sdk","app"],title:"Web Messenger did not open — using mock chat"}); openChat(); });
+  }
+};
+
+/* ---------------- app mode + install ---------------- */
+(function(){
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const q = new URLSearchParams(location.search);
+  if(standalone || q.has("app") || (innerWidth < 700 && !q.has("desk"))) document.body.classList.add("app-mode");
+  if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+GC.handleReturn().finally(()=>render());
+WEB.load();
+
+init();
+</script>
+</body>
+</html>
