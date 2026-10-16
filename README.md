@@ -16,7 +16,7 @@ If a live call fails, the app falls back to the mock.
 
 ## Files
 
-- `index.html` — the whole app (phone UI, event inspector, going-live plan)
+- `index.html` — the whole app (phone UI, going-live plan)
 - `config.js` — demo org values. **Edit this file only.**
 - `manifest.webmanifest`, `sw.js`, `icons/` — PWA install and offline cache
 

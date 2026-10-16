@@ -29,8 +29,8 @@ window.DEMO_CONFIG = {
   // Messenger configuration: launcher visibility = "Hide until triggered by business logic".
   // Messenger deployment: allowed domains must include the GitHub Pages domain.
   webMessenger: {
-    chat: "mock",                // "mock" = scripted chat, "web" = Genesys Web Messenger
-    environment: "prod-cac1",    // Canada region
-    deploymentId: ""             // Messenger deployment ID
+    chat: "web",                 // "mock" = scripted chat, "web" = Genesys Web Messenger
+    environment: "prod",         // US East (apps.mypurecloud.com)
+    deploymentId: "5dc5b4fc-7b77-4c8b-bef8-bf0015aaf6f6"
   }
 };
