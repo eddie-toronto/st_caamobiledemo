@@ -1,33 +1,36 @@
-// Demo settings for the live "Call me" callback.
-// Fill these in from the Genesys Cloud demo org. Nothing here is a secret:
-// the OAuth client uses PKCE or implicit grant, so there is no client secret.
+// Demo settings. Nothing here is a secret: the OAuth client uses PKCE or implicit grant (no client secret).
+// The phone number to call is NOT stored here. Enter it on the phone in
+// MyCAA > Security & App Settings > Presenter tools (saved on that device only).
 window.DEMO_CONFIG = {
-  // "mock" = everything simulated. "live" = "Call me" creates a real callback.
-  mode: "mock",
+  // "mock" = everything simulated. "live" = Call Me and Submit Request create real callbacks.
+  mode: "live",
 
-  // Genesys Cloud region domain (Canada = cac1.pure.cloud)
-  region: "cac1.pure.cloud",
+  // Genesys Cloud region domain (demo org is US East)
+  region: "mypurecloud.com",
 
-  // OAuth client on the demo org
+  // OAuth client on the demo org (blank = paste a token in Presenter tools)
   grant: "pkce",                 // "pkce" or "implicit"
-  clientId: "",                  // OAuth client ID
-  redirectUri: "",               // leave blank to use this page's URL
+  clientId: "",
+  redirectUri: "",               // blank = this page's URL
 
-  // Callback routing
-  queueId: "",                   // CAA Demo - Member Care
-  scriptId: "",                  // callback script that shows the member data
+  // Contact Us > Call Me
+  queueId: "edf6c944-ecb2-47a9-aa98-6e47e4f995b9",
+  queueName: "demo_caa_mobileprototype_Oct2026",
 
-  // Who gets called
-  callbackNumber: "",            // presenter's mobile, E.164, e.g. "+14165550142"
+  // Roadside > Submit Request (blank = uses the member care queue above)
+  roadsideQueueId: "",
+  roadsideQueueName: "",
+
+  // Fallback only; prefer the on-device number in Presenter tools
+  callbackNumber: "",
   callbackUserName: "Alex Morgan",
 
-  // What the presenter's phone shows as the incoming caller (org outbound number)
-  callerId: "",                  // E.164
-  callerIdName: "CAA Member Care",
+  // Caller ID shown on the member's phone (blank = queue setting)
+  callerId: "",
+  callerIdName: "CAA Demo",
 
-  // "Chat with us" — Genesys Web Messenger.
+  // Contact Us > Chat With Us — Genesys Web Messenger
   // Messenger configuration: launcher visibility = "Hide until triggered by business logic".
-  // Messenger deployment: allowed domains must include the GitHub Pages domain.
   webMessenger: {
     chat: "web",                 // "mock" = scripted chat, "web" = Genesys Web Messenger
     environment: "prod",         // US East (apps.mypurecloud.com)

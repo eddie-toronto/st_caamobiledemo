@@ -1,6 +1,6 @@
 // Caches the app shell so the demo opens instantly and survives bad venue Wi-Fi.
 // Bump CACHE when you push changes so phones pick up the new version.
-const CACHE = "caa-mobile-concept-v4";
+const CACHE = "caa-mobile-concept-v5";
 const SHELL = [
   "./", "./index.html", "./config.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"

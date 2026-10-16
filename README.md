@@ -8,23 +8,28 @@ All member data is fictional. Not a CAA production app.
 
 | Feature | Default | Live option |
 |---|---|---|
-| Sign-in, roadside request, AI agent chat | Mocked | — |
-| **Call me** | Mocked | Real callback via `POST /api/v2/conversations/callbacks` |
-| **Chat with us** | Mocked chat | Genesys Web Messenger, launcher hidden until the button is tapped |
+| Sign-in, home, rewards | Mocked | — |
+| **Roadside → Submit Request** | Simulated call | Customer-first callback to the roadside queue (`roadsideQueueId`, falls back to `queueId`) |
+| **MyCAA → Contact Us → Call Me** | Simulated call | Customer-first callback to the member care queue (`queueId`) |
+| **MyCAA → Contact Us → Chat With Us** | Mocked chat | Genesys Web Messenger, launcher hidden until the card is tapped |
+
+Each callback sends `data` with `customerName`, `memberNumber`, `membershipLevel`, `vehicle`, `requestedFrom` and `targetQueue` (the queue name, for the inbound flow's Transfer to ACD). Roadside adds `rsaRequestId`, `rsaStatus`, `locationType`, `breakdownAddress`, `gpsLat`, `gpsLng`, `vehicleType`, `vehicleYear`, `vehicleMake`, `vehicleModel`, `vehicleColor`, `vehicleDriveLine`.
 
 If a live call fails, the app falls back to the mock.
 
 ## Files
 
 - `index.html` — the whole app (phone UI, going-live plan)
+- Map on the breakdown-location screen: Leaflet from unpkg, tiles from OpenStreetMap/CARTO (needs a connection)
 - `config.js` — demo org values. **Edit this file only.**
 - `manifest.webmanifest`, `sw.js`, `icons/` — PWA install and offline cache
 
 ## Setup
 
 1. Fill in `config.js`:
-   - `mode: "live"`, `clientId`, `queueId`, `scriptId`, `callerId`, `callbackNumber` (presenter's mobile, E.164)
+   - `mode: "live"`, `region`, `queueId`/`queueName`, `roadsideQueueId`/`roadsideQueueName`, optional `clientId`, `callerId`
    - `webMessenger.chat: "web"`, `webMessenger.deploymentId`
+   - The phone number to call is **not** in the repo. On the phone: MyCAA → Security & App Settings → enter the number → Save (stored on that device only).
 2. Genesys Cloud demo org:
    - OAuth client (Code Authorization + PKCE, or Implicit). Redirect URI = the exact Pages URL.
    - Role with `Conversation > Callback > Create` for the presenter user.
@@ -44,7 +49,7 @@ On the phone the app runs full screen. On a laptop the page shows the phone fram
 
 ## Presenter tools
 
-**More** tab → Presenter tools: shows the mode, Genesys sign-in status and the number that will be called. Connect Genesys, paste a token if the sign-in redirect misbehaves on iPhone, or reset the demo.
+**MyCAA → Security & App Settings** opens Presenter tools: mode, Genesys sign-in status, queues, Web Messenger status, the phone number to call (saved on the device), Connect Genesys or paste a token, and reset.
 
 ## Notes
 
