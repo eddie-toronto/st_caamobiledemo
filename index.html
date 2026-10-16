@@ -180,6 +180,13 @@ main{display:grid;grid-template-columns:420px;justify-content:center;gap:20px;pa
 .steps i{flex:1;height:5px;border-radius:3px;background:#dfe4ee}
 .steps i.on{background:var(--btn)}
 
+.mbox{width:100%;background:rgba(255,255,255,.07);border:1px solid #2c4c70;border-radius:10px;padding:8px 14px;margin-top:18px;text-align:left}
+.mrow{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0}
+.mrow+.mrow{border-top:1px solid rgba(255,255,255,.09)}
+.mrow span{color:#9fb4ca}
+.mrow b{color:#fff;font-weight:600;text-align:right}
+.mbox .auth{color:#7fd6a2}
+.sent{font-size:11.5px;color:#9fb4ca;margin-top:10px}
 /* drawer */
 .dshade{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:30}
 .drawer{position:absolute;top:0;bottom:0;right:0;width:90%;background:#fff;z-index:31;overflow-y:auto;animation:slide .25s ease;display:flex;flex-direction:column}
@@ -456,7 +463,7 @@ body.app-mode .sheet{top:calc(42px + env(safe-area-inset-top))}
 <script>
 /* ---------------- demo data (fictional member) ---------------- */
 const MEMBER = {
-  name:"Alex", fullName:"Alex Morgan", memberNumber:"620 2794 0000 4417 3", level:"Plus",
+  name:"Alex", fullName:"Alex Morgan", memberNumber:"620 2794 0000 4417 3", level:"Plus", status:"Active",
   since:"2014", phone:"+1 416-555-0142", email:"alex.morgan@example.com",
   caaDollars:"14.20", fuelSavings:"$48.20", saved:"$126.35", roadsideUsed:"1 of 4",
   vehicle:{type:"Passenger",year:"2025",make:"Mazda",model:"CX-5",color:"Black",drive:"Automatic"},
@@ -660,8 +667,8 @@ const SCREENS = {
       <p>A roadside specialist will call you at <b>${callNumber()}</b> in a moment to confirm the details.</p>
       <p>Stay in a safe place with your hazard lights on.</p>
       <div class="ref">Request ${S.rsa.id}</div>
+      ${memberBox()}
       <div class="foot">
-        ${cb.live?"":`<button class="cta" data-act="ring">▶ Simulate the call</button>`}
         <button class="cta ghost" data-go="rsaStatus">View Request Status</button>
       </div></div>`;
   },
@@ -695,8 +702,8 @@ const SCREENS = {
       <p>A member care specialist will call <b>${callNumber()}</b> in a moment.</p>
       <p>They already have your membership details on screen.</p>
       <div class="ref">Reference ${cb.ref}</div>
+      ${memberBox()}
       <div class="foot">
-        ${cb.live?"":`<button class="cta" data-act="ring">▶ Simulate the call</button>`}
         <button class="cta ghost" data-go="contact">Back to Contact Us</button>
       </div></div>`;
   },
@@ -730,6 +737,16 @@ const SCREENS = {
   }
 };
 
+function memberBox(){
+  const cb=S.callback||{};
+  return `<div class="mbox">
+      <div class="mrow"><span>Name</span><b>${MEMBER.fullName}</b></div>
+      <div class="mrow"><span>Member ID</span><b>${MEMBER.memberNumber}</b></div>
+      <div class="mrow"><span>Member status</span><b>${MEMBER.status} · ${MEMBER.level}</b></div>
+      <div class="mrow"><span>Authenticated</span><b class="auth">✓ Yes</b></div>
+    </div>
+    <div class="sent">${cb.live?"Sent to Genesys Cloud with your call request":"Not connected to Genesys Cloud. No call was placed."}</div>`;
+}
 function drawer(){
   return `<div class="dshade" data-act="closeDrawer"></div><div class="drawer">
     <div class="dh"><span class="mini"></span><div><b>MyCAA</b><small>${MEMBER.name}</small></div><span class="x" data-act="closeDrawer">${I.x}</span></div>
@@ -788,7 +805,7 @@ function doMfa(){ S.screen="home"; S.tab="home"; render(); }
 /* ---------------- callback data ---------------- */
 function cbData(roadside){
   const v=MEMBER.vehicle;
-  const d = { customerName:MEMBER.fullName, memberNumber:MEMBER.memberNumber.replace(/ /g,""), membershipLevel:MEMBER.level,
+  const d = { customerName:MEMBER.fullName, memberNumber:MEMBER.memberNumber.replace(/ /g,""), membershipLevel:MEMBER.level, memberStatus:MEMBER.status, authenticated:"true",
     vehicle:`${v.year} ${v.make} ${v.model} - ${v.color}`, requestedFrom:"mobile_app" };
   if(S.rsa){ d.rsaRequestId=S.rsa.id; d.rsaStatus=S.rsa.status; }
   if(roadside){
@@ -814,7 +831,7 @@ async function requestCallback(kind){
   const ref="CB-"+Math.floor(100000+Math.random()*899999);
   S.callback={kind,ref,live:false};
   if(!(isLive() && GC.token())){
-    if(LIVE.mode==="live") toast("Demo mode","Genesys isn't connected — running the simulated call",2600);
+    if(LIVE.mode==="live") toast("Not connected","Genesys isn't connected, so no call was placed. Open MyCAA → Security & App Settings.",3200);
     return;
   }
   const rs = kind==="roadside";
@@ -836,7 +853,7 @@ async function requestCallback(kind){
     console.info("Callback created",json);
   }catch(e){
     console.warn("Live callback failed, using the simulated call",e);
-    S.toast=null; toast("Call me (demo)","Live call failed ("+e.message.slice(0,60)+"). Using the simulated call.",3200);
+    S.toast=null; toast("Call request failed","Call request failed ("+e.message.slice(0,60)+"). No call was placed.",3200);
   }
 }
 function ring(){ later(600,()=>{ S.ringing=true; }); }
