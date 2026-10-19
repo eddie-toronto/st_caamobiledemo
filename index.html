@@ -139,6 +139,8 @@ main{display:grid;grid-template-columns:420px;justify-content:center;gap:20px;pa
 .mctl .zm button{box-shadow:none;border-radius:0;height:36px;font-size:22px;font-weight:300}
 .mctl .zm button+button{border-top:1px solid #e3e3e3}
 .leaflet-control-attribution{font-size:8px!important}
+.bmap{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:38% 37%;transform-origin:38% 37%;transition:transform .2s;z-index:0}
+.mattr{position:absolute;left:6px;top:6px;z-index:500;font-size:8px;background:rgba(255,255,255,.85);padding:1px 5px;border-radius:3px;color:#333}
 .mfoot{padding:14px 14px 18px;background:#fff;flex:0 0 auto}
 .addrbox{border:1px solid #cfd3d8;border-radius:6px;padding:11px 12px;font-size:14px;color:var(--txt-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:12px}
 
@@ -469,6 +471,9 @@ const MEMBER = {
   vehicle:{type:"Passenger",year:"2025",make:"Mazda",model:"CX-5",color:"Black",drive:"Automatic"},
   address:"205 Thornwillow Ct, Newmarket, ON L3Y 5R3", lat:44.0557697, lng:-79.4393836
 };
+// Breakdown location for the roadside demo (Hwy 401, Toronto). Image: Google Maps screenshot, attribution kept on screen.
+const BREAKDOWN = { address:"Hwy 401 Express near Exit 359, Toronto, ON", short:"Hwy 401 Express near Exit 359",
+  lat:43.715056, lng:-79.529167, image:"img/breakdown-401.jpg" };   // 43°42'54.2"N 79°31'45.0"W
 const vehicleText = () => { const v=MEMBER.vehicle; return `${v.year} ${v.make} ${v.model} · ${v.color}`; };
 const LOCTYPES = [
   ["SHOULDER","Shoulder"],["ROADWAY","Roadway"],["MEDIAN","Median/Between Lanes of Traffic"],
@@ -632,12 +637,12 @@ const SCREENS = {
 
   location(){
     return `${statusBar(NAVY)}${nav("Select Breakdown Location","roadside","roadside")}
-      <div class="mapwrap"><div id="lmap"></div>
-        <svg class="mpin" viewBox="0 0 36 46"><ellipse cx="18" cy="43" rx="5" ry="2.5" fill="#2466a8" opacity=".9"/><path d="M18 1C9 1 2 8 2 16.5 2 27 18 41 18 41s16-14 16-24.5C34 8 27 1 18 1z" fill="#16365a"/><circle cx="18" cy="16" r="6.5" fill="#fff"/></svg>
+      <div class="mapwrap"><img class="bmap" src="${BREAKDOWN.image}" alt="Breakdown location on Hwy 401" style="transform:scale(${S.mapZoom||1})">
+        <div class="mattr">Imagery © Google · ${BREAKDOWN.lat.toFixed(6)}, ${BREAKDOWN.lng.toFixed(6)}</div>
         <div class="mctl"><button data-act="locate" aria-label="My location">${I.locate}</button>
           <div class="zm"><button data-act="zin" aria-label="Zoom in">+</button><button data-act="zout" aria-label="Zoom out">−</button></div></div>
       </div>
-      <div class="mfoot"><div class="addrbox">${MEMBER.address}</div>
+      <div class="mfoot"><div class="addrbox">${BREAKDOWN.address}</div>
         <button class="cta" data-act="openSheet">Proceed to Select Location Type</button></div>
       ${S.sheet?`<div class="shade" data-act="closeSheet"></div><div class="sheet"><div class="hd"></div>
         <div class="sh">Select The Type of Location<span class="x" data-act="closeSheet">${I.x}</span></div>
@@ -649,7 +654,7 @@ const SCREENS = {
     const v=MEMBER.vehicle, lt=(LOCTYPES.find(x=>x[0]===S.locType)||["",""])[1];
     return `${statusBar(NAVY)}${nav("Confirm Request","location","roadside")}<div class="gbody">
       <div class="card"><div class="ch">${I.pin}Breakdown Location<span class="ed" data-go="location">Edit</span></div>
-        <div class="ad">${MEMBER.address}</div>${lt?`<span class="chip">${lt}</span>`:""}</div>
+        <div class="ad">${BREAKDOWN.address}</div>${lt?`<span class="chip">${lt}</span>`:""}</div>
       <div class="card"><div class="ch">${I.car}Vehicle<span class="ed">Edit</span></div>
         <div class="kvs"><span>Type</span><b>${v.type}</b><span>Year</span><b>${v.year}</b><span>Make</span><b>${v.make}</b>
           <span>Model</span><b>${v.model}</b><span>Colour</span><b>${v.color}</b><span>Drive Line</span><b>${v.drive}</b></div></div>
@@ -680,7 +685,7 @@ const SCREENS = {
       <div class="card"><span class="st-pill">Request received</span>
         <div class="eta">Calling you now</div><div class="hint" style="margin:2px 0 0">A specialist confirms the details, then dispatches a driver.</div>
         <div class="steps"><i class="on"></i><i></i><i></i><i></i></div>
-        <div class="kvs"><span>Request</span><b>${r.id}</b><span>Location</span><b>${MEMBER.address.split(",")[0]}</b><span>Location type</span><b>${lt}</b><span>Vehicle</span><b>${vehicleText()}</b></div>
+        <div class="kvs"><span>Request</span><b>${r.id}</b><span>Location</span><b>${BREAKDOWN.short}</b><span>Location type</span><b>${lt}</b><span>Vehicle</span><b>${vehicleText()}</b></div>
       </div>
       <div class="card cc go" data-act="callMember" style="box-shadow:none;margin:0"><span class="ci">${IL.callme}</span><div><b>Need to talk to us?</b><p>Contact Us has Call Me and Chat With Us.</p></div></div>
     </div>${tabbar()}`;
@@ -734,7 +739,7 @@ const SCREENS = {
   oncall(){
     const rs = S.callback && S.callback.kind==="roadside";
     return `<div class="ring" style="justify-content:flex-start;gap:14px"><div class="avatar" style="margin-top:20px">CAA</div><h2>CAA ${rs?"Roadside":"Member Care"}</h2><p>Priya · 00:${String(S.secs).padStart(2,"0")}</p>
-      <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px;font-size:13px;line-height:1.45;margin-top:20px">“Hi ${MEMBER.name}, it's Priya from CAA. ${rs?`I have your request for the ${MEMBER.vehicle.make} ${MEMBER.vehicle.model} at ${MEMBER.address.split(",")[0]}. Are you somewhere safe?`:`I can see your ${MEMBER.level} membership. How can I help?`}”</div>
+      <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px;font-size:13px;line-height:1.45;margin-top:20px">“Hi ${MEMBER.name}, it's Priya from CAA. ${rs?`I have your request for the ${MEMBER.vehicle.make} ${MEMBER.vehicle.model} at ${BREAKDOWN.short}. Are you somewhere safe?`:`I can see your ${MEMBER.level} membership. How can I help?`}”</div>
       <div style="flex:1"></div><div class="acts"><button style="background:var(--red)" data-act="hang">✕</button></div></div>`;
   }
 };
@@ -816,8 +821,8 @@ function cbData(roadside){
     vehicle:`${v.year} ${v.make} ${v.model} - ${v.color}`, requestedFrom:"mobile_app" };
   if(S.rsa){ d.rsaRequestId=S.rsa.id; d.rsaStatus=S.rsa.status; }
   if(roadside){
-    Object.assign(d,{ locationType:(LOCTYPES.find(x=>x[0]===S.locType)||["",""])[1], breakdownAddress:MEMBER.address,
-      gpsLat:String(MEMBER.lat), gpsLng:String(MEMBER.lng),
+    Object.assign(d,{ locationType:(LOCTYPES.find(x=>x[0]===S.locType)||["",""])[1], breakdownAddress:BREAKDOWN.address,
+      gpsLat:String(BREAKDOWN.lat), gpsLng:String(BREAKDOWN.lng),
       vehicleType:v.type, vehicleYear:v.year, vehicleMake:v.make, vehicleModel:v.model, vehicleColor:v.color, vehicleDriveLine:v.drive });
   }
   return d;
@@ -910,9 +915,9 @@ document.getElementById("screen").addEventListener("click",e=>{
     case "bell": return toast("Notifications","You're all caught up.");
     case "openSheet": S.sheet=true; return render();
     case "closeSheet": S.sheet=false; return render();
-    case "locate": if(MAP) MAP.setView([MEMBER.lat,MEMBER.lng],16); return;
-    case "zin": if(MAP) MAP.zoomIn(); return;
-    case "zout": if(MAP) MAP.zoomOut(); return;
+    case "locate": S.mapZoom=1; return render();
+    case "zin": S.mapZoom=Math.min(3,(S.mapZoom||1)+0.5); return render();
+    case "zout": S.mapZoom=Math.max(1,(S.mapZoom||1)-0.5); return render();
     case "closeDrawer": S.drawer=false; return render();
     case "signout": return init();
     case "submitRsa": return submitRsa();
